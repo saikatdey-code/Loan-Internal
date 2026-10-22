@@ -1,0 +1,10 @@
+export {default as AuthHeader} from './AuthHeader';
+export {default as LandscapeFooter} from './LandscapeFooter';
+export {default as SecurityNoticeCard} from './SecurityNoticeCard';
+export {default as SecurityFooter} from './SecurityFooter';
+export {default as PhoneInputField} from './PhoneInputField';
+export {default as OtpInputBoxes} from './OtpInputBoxes';
+export {default as VerifyingSpinner} from './VerifyingSpinner';
+export {default as SuccessBadge} from './SuccessBadge';
+export {default as AadhaarInput} from './AadhaarInput';
+export {default as WatermarkBackground} from './WatermarkBackground';
