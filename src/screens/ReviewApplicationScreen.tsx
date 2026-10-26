@@ -18,7 +18,7 @@
  *   { loanId, declearedName, declearedGuardianName, declaration: true, noObjection: true }
  * - Navigates to Dashboard (MainTabs) on success
  */
-import React, {useState, useCallback, useEffect, useRef} from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -36,13 +36,13 @@ import {
   Modal,
   Dimensions,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Circle, Rect} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Rect } from 'react-native-svg';
 
-import {Logo, useToast, WatermarkBackground, SubmissionSuccessModal} from '../components';
+import { Logo, useToast, WatermarkBackground, SubmissionSuccessModal } from '../components';
 import SelectionModal from '../components/SelectionModal';
-import {isFieldEditable, isSectionEditable, parseFieldList} from '../utils/fieldPermissions';
-import type {RootStackScreenProps} from '../types/navigation';
+import { isFieldEditable, isSectionEditable, parseFieldList } from '../utils/fieldPermissions';
+import type { RootStackScreenProps } from '../types/navigation';
 import {
   getLoanDetailsAuth,
   getLoanList,
@@ -55,7 +55,9 @@ import {
   getStoredLoanDetails,
   setStoredLoanDetails,
   getUserProfile,
+  clearAll,
 } from '../services/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = RootStackScreenProps<'ReviewApplication'>;
 
@@ -88,7 +90,7 @@ const cleanHtml = (text?: string | null): string => {
   return text.replace(/<[^>]*>?/gm, '').trim();
 };
 
-const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
+const ReviewApplicationScreen: React.FC<Props> = ({ navigation, route }) => {
   const toast = useToast();
   const scrollViewRef = useRef<ScrollViewInstance | null>(null);
   const guardianInputRef = useRef<TextInputInstance | null>(null);
@@ -122,6 +124,25 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
   const [previewImageError, setPreviewImageError] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [submittedAppId, setSubmittedAppId] = useState('');
+  const isSigningOutRef = useRef(false);
+
+  const handleSignOutAfterSubmission = useCallback(async () => {
+    if (isSigningOutRef.current) return;
+    isSigningOutRef.current = true;
+    setSuccessModalVisible(false);
+
+    try {
+      await clearAll();
+      await AsyncStorage.clear();
+    } catch (e) {
+      console.warn('[ReviewApplication] Failed to clear storage on signout:', e);
+    }
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Auth', params: { screen: 'Login' } }],
+    });
+  }, [navigation]);
 
   const resolveDocUri = (val?: any): string => {
     if (!val) return '';
@@ -272,8 +293,8 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
               if (cached.declearedGuardianName || cached.userDetails?.guardianName) {
                 setDeclearedGuardianName(
                   cached.declearedGuardianName ||
-                    cached.userDetails?.guardianName ||
-                    '',
+                  cached.userDetails?.guardianName ||
+                  '',
                 );
               }
             }
@@ -294,8 +315,8 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
             if (cached.declearedGuardianName || cached.userDetails?.guardianName) {
               setDeclearedGuardianName(
                 cached.declearedGuardianName ||
-                  cached.userDetails?.guardianName ||
-                  '',
+                cached.userDetails?.guardianName ||
+                '',
               );
             }
           }
@@ -319,8 +340,8 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
           if (cached.declearedGuardianName || cached.userDetails?.guardianName) {
             setDeclearedGuardianName(
               cached.declearedGuardianName ||
-                cached.userDetails?.guardianName ||
-                '',
+              cached.userDetails?.guardianName ||
+              '',
             );
           }
         }
@@ -353,7 +374,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
         'Please enter the Guardian Name (Father / Husband) in the Declaration section before submitting.',
       );
       // Scroll to declaration card
-      scrollViewRef.current?.scrollToEnd({animated: true});
+      scrollViewRef.current?.scrollToEnd({ animated: true });
       setTimeout(() => {
         guardianInputRef.current?.focus();
       }, 300);
@@ -476,8 +497,8 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
   const displayStatus = loanData?.loanStatus
     ? loanData.loanStatus.toUpperCase()
     : isSubmittedApplication
-    ? 'SUBMITTED'
-    : 'IN PROGRESS';
+      ? 'SUBMITTED'
+      : 'IN PROGRESS';
 
   // Count uploaded documents
   const docPhotos = [
@@ -527,7 +548,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
           style={styles.backButton}
           onPress={handleBack}
           activeOpacity={0.7}
-          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
             <Path
               d="M19 12H5M5 12L12 19M5 12L12 5"
@@ -675,16 +696,16 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
               </View>
               {Boolean(
                 loanData?.reasonOfRejectionDetails?.name ||
-                  loanData?.reasonOfRejection,
+                loanData?.reasonOfRejection,
               ) && (
-                <View style={styles.rejectionRow}>
-                  <Text style={styles.rejectionRowLabel}>Reason for Rejection:</Text>
-                  <Text style={styles.rejectionRowValue}>
-                    {loanData?.reasonOfRejectionDetails?.name ||
-                      loanData?.reasonOfRejection}
-                  </Text>
-                </View>
-              )}
+                  <View style={styles.rejectionRow}>
+                    <Text style={styles.rejectionRowLabel}>Reason for Rejection:</Text>
+                    <Text style={styles.rejectionRowValue}>
+                      {loanData?.reasonOfRejectionDetails?.name ||
+                        loanData?.reasonOfRejection}
+                    </Text>
+                  </View>
+                )}
               {Boolean(loanData?.officerComment) && (
                 <View style={styles.rejectionRow}>
                   <Text style={styles.rejectionRowLabel}>Officer Comment:</Text>
@@ -985,13 +1006,13 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
             <View style={styles.twoColumnGrid}>
               <View style={styles.columnHalf}>
                 <View style={styles.itemBlock}>
-                  <Text style={styles.gridLabel}>SHG Name</Text>
+                  <Text style={styles.gridLabel}>APUNBA</Text>
                   <Text style={styles.gridValue}>
                     {shg?.shgName || 'TestSAIK'}
                   </Text>
                 </View>
                 <View style={styles.itemBlock}>
-                  <Text style={styles.gridLabel}>Date of Formation</Text>
+                  <Text style={styles.gridLabel}>D-F</Text>
                   <Text style={styles.gridValue}>
                     {formatDate(shg?.dateOfFormation)}
                   </Text>
@@ -1000,7 +1021,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
 
               <View style={styles.columnHalf}>
                 <View style={styles.itemBlock}>
-                  <Text style={styles.gridLabel}>SHG ID Number</Text>
+                  <Text style={styles.gridLabel}>APUNBA Id</Text>
                   <Text style={styles.gridValue}>
                     {shg?.shgId || '2dew2dew'}
                   </Text>
@@ -1287,7 +1308,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                   onFocus={() => {
                     setIsGuardianFocused(true);
                     setTimeout(() => {
-                      scrollViewRef.current?.scrollToEnd({animated: true});
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
                     }, 150);
                   }}
                   onBlur={() => setIsGuardianFocused(false)}
@@ -1398,7 +1419,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                   });
                 }}>
                 <View style={[styles.docPreviewImageWrapper, styles.docPreviewFileWrapper]}>
-                  <View style={[styles.defaultFileIconBadge, {backgroundColor: '#FAF5FF'}]}>
+                  <View style={[styles.defaultFileIconBadge, { backgroundColor: '#FAF5FF' }]}>
                     <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
                       <Path
                         d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
@@ -1424,8 +1445,8 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                       />
                     </Svg>
                   </View>
-                  <View style={[styles.fileFormatTag, {backgroundColor: '#EDE9FE'}]}>
-                    <Text style={[styles.fileFormatText, {color: '#7C3AED'}]}>JPG / PNG</Text>
+                  <View style={[styles.fileFormatTag, { backgroundColor: '#EDE9FE' }]}>
+                    <Text style={[styles.fileFormatText, { color: '#7C3AED' }]}>JPG / PNG</Text>
                   </View>
                   <View style={styles.docPreviewOverlay}>
                     <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
@@ -1505,7 +1526,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                   </View>
                 </View>
                 <Text style={styles.docPreviewLabel} numberOfLines={1}>
-                  SHG Certificate
+                  C
                 </Text>
               </TouchableOpacity>
 
@@ -1521,14 +1542,14 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                   );
                   setPreviewImageError(false);
                   setPreviewDoc({
-                    title: 'Bank Passbook',
+                    title: 'P',
                     uri: bankUri,
                     fileName,
-                    docType: 'Bank Account Passbook Copy',
+                    docType: 'P',
                   });
                 }}>
                 <View style={[styles.docPreviewImageWrapper, styles.docPreviewFileWrapper]}>
-                  <View style={[styles.defaultFileIconBadge, {backgroundColor: '#EFF6FF'}]}>
+                  <View style={[styles.defaultFileIconBadge, { backgroundColor: '#EFF6FF' }]}>
                     <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
                       <Path
                         d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
@@ -1554,8 +1575,8 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                       />
                     </Svg>
                   </View>
-                  <View style={[styles.fileFormatTag, {backgroundColor: '#DBEAFE'}]}>
-                    <Text style={[styles.fileFormatText, {color: '#1D4ED8'}]}>PASSBOOK</Text>
+                  <View style={[styles.fileFormatTag, { backgroundColor: '#DBEAFE' }]}>
+                    <Text style={[styles.fileFormatText, { color: '#1D4ED8' }]}>PASSBOOK</Text>
                   </View>
                   <View style={styles.docPreviewOverlay}>
                     <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
@@ -1570,7 +1591,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                   </View>
                 </View>
                 <Text style={styles.docPreviewLabel} numberOfLines={1}>
-                  Bank Passbook
+                  P
                 </Text>
               </TouchableOpacity>
             </View>
@@ -1579,38 +1600,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
           {/* ══════════════════════════════════════════════════════
               CONFIRMATION CHECKBOX CARD
              ══════════════════════════════════════════════════════ */}
-          <TouchableOpacity
-            style={styles.confirmBox}
-            onPress={() => setIsConfirmed(!isConfirmed)}
-            activeOpacity={0.8}>
-            <View style={styles.confirmLeft}>
-              <View style={styles.infoCircle}>
-                <Text style={styles.infoLetter}>i</Text>
-              </View>
-              <Text style={styles.confirmText}>
-                I confirm that the above information is correct and complete.
-              </Text>
-            </View>
 
-            {/* Interactive Checkbox */}
-            <View
-              style={[
-                styles.checkbox,
-                isConfirmed && styles.checkboxActive,
-              ]}>
-              {isConfirmed && (
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M20 6L9 17L4 12"
-                    stroke="#FFFFFF"
-                    strokeWidth={3}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              )}
-            </View>
-          </TouchableOpacity>
 
           {/* ══════════════════════════════════════════════════════
               BOTTOM BUTTONS: [ ← Back ] [ Submit Application → ]
@@ -1682,7 +1672,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
         }}>
         <View style={styles.previewModalOverlay}>
           <View style={styles.previewModalHeader}>
-            <View style={{width: 36}} />
+            <View style={{ width: 36 }} />
             <Text style={styles.previewModalTitle}>{previewDoc?.title}</Text>
             <TouchableOpacity
               style={styles.previewModalCloseBtn}
@@ -1706,7 +1696,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
           {previewDoc?.uri && !previewImageError ? (
             <View style={styles.previewImageContainer}>
               <Image
-                source={{uri: previewDoc.uri}}
+                source={{ uri: previewDoc.uri }}
                 style={styles.previewModalImage}
                 resizeMode="contain"
                 onError={() => setPreviewImageError(true)}
@@ -1774,7 +1764,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 </View>
                 <View style={styles.docModalDetailRow}>
                   <Text style={styles.docModalDetailLabel}>Status</Text>
-                  <Text style={[styles.docModalDetailVal, {color: '#00875A'}]}>
+                  <Text style={[styles.docModalDetailVal, { color: '#00875A' }]}>
                     Verified
                   </Text>
                 </View>
@@ -1797,18 +1787,16 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
       {/* Submission Success Modal */}
       <SubmissionSuccessModal
         visible={successModalVisible}
-        applicationId={submittedAppId || displayAppId}
         title="Application Submitted Successfully!"
-        message={`Your application ${
-          submittedAppId || displayAppId
-        } has been successfully submitted for verification. Tracking status is available on your dashboard.`}
-        onGoToDashboard={() => {
-          setSuccessModalVisible(false);
-          navigation.reset({
-            index: 0,
-            routes: [{name: 'MainTabs'}],
-          });
-        }}
+        showAppId={false}
+        showMessage={false}
+        showStatusPill={false}
+        buttonText="OK"
+        showButtonArrow={false}
+        autoDismissMs={3000}
+        onPrimaryAction={handleSignOutAfterSubmission}
+        onGoToDashboard={handleSignOutAfterSubmission}
+        onClose={handleSignOutAfterSubmission}
       />
     </SafeAreaView>
   );
@@ -2108,7 +2096,7 @@ const styles = StyleSheet.create({
     borderColor: '#00875A',
     backgroundColor: '#FFFFFF',
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.15,
     shadowRadius: 3,
     elevation: 2,
@@ -2241,7 +2229,7 @@ const styles = StyleSheet.create({
     width: '88%',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 12,
     elevation: 8,
@@ -2478,7 +2466,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 4,

@@ -8,7 +8,7 @@
  * - Status pill with verification status note
  * - Primary "Go to Dashboard" action button
  */
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -27,7 +27,15 @@ interface SubmissionSuccessModalProps {
   applicationId?: string;
   title?: string;
   message?: string;
-  onGoToDashboard: () => void;
+  showAppId?: boolean;
+  showMessage?: boolean;
+  showStatusPill?: boolean;
+  showButton?: boolean;
+  buttonText?: string;
+  showButtonArrow?: boolean;
+  autoDismissMs?: number;
+  onGoToDashboard?: () => void;
+  onPrimaryAction?: () => void;
   onClose?: () => void;
 }
 
@@ -36,12 +44,35 @@ const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
   applicationId,
   title = 'Application Submitted Successfully!',
   message = 'Your application has been successfully submitted for verification. Tracking status is available on your dashboard.',
+  showAppId = true,
+  showMessage = true,
+  showStatusPill = true,
+  showButton = true,
+  buttonText = 'Go to Dashboard',
+  showButtonArrow = true,
+  autoDismissMs,
   onGoToDashboard,
+  onPrimaryAction,
   onClose,
 }) => {
   const [copied, setCopied] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0.85)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleAction = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (onPrimaryAction) {
+      onPrimaryAction();
+    } else if (onGoToDashboard) {
+      onGoToDashboard();
+    } else if (onClose) {
+      onClose();
+    }
+  }, [onPrimaryAction, onGoToDashboard, onClose]);
 
   useEffect(() => {
     if (visible) {
@@ -60,11 +91,28 @@ const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
           useNativeDriver: true,
         }),
       ]).start();
+
+      if (autoDismissMs && autoDismissMs > 0) {
+        timerRef.current = setTimeout(() => {
+          handleAction();
+        }, autoDismissMs);
+      }
     } else {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
       scaleAnim.setValue(0.85);
       opacityAnim.setValue(0);
     }
-  }, [visible, scaleAnim, opacityAnim]);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [visible, scaleAnim, opacityAnim, autoDismissMs, handleAction]);
 
   const handleCopy = () => {
     if (!applicationId) return;
@@ -82,10 +130,10 @@ const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose || onGoToDashboard}>
+      onRequestClose={handleAction}>
       <Pressable
         style={styles.backdrop}
-        onPress={onClose || onGoToDashboard}>
+        onPress={handleAction}>
         <Animated.View
           style={[
             styles.modalCard,
@@ -99,7 +147,7 @@ const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
             {onClose && (
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={onClose}
+                onPress={handleAction}
                 activeOpacity={0.7}
                 hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
@@ -158,10 +206,12 @@ const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>{title}</Text>
+            <Text style={[styles.title, !showAppId && !showMessage && !showStatusPill && styles.titleMinimal]}>
+              {title}
+            </Text>
 
-            {/* Application ID Card (if provided) */}
-            {applicationId ? (
+            {/* Application ID Card (if provided & enabled) */}
+            {showAppId && applicationId ? (
               <View style={styles.appIdBox}>
                 <View style={styles.appIdContent}>
                   <Text style={styles.appIdLabel}>APPLICATION NUMBER</Text>
@@ -213,47 +263,55 @@ const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
             ) : null}
 
             {/* Explanatory Message */}
-            <Text style={styles.message}>{message}</Text>
+            {showMessage && message ? (
+              <Text style={styles.message}>{message}</Text>
+            ) : null}
 
             {/* Status Information Pill */}
-            <View style={styles.statusPill}>
-              <View style={styles.statusIconWrap}>
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                    fill="#DCFCE7"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                  />
-                  <Path
-                    d="M12 6V12L16 14"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
+            {showStatusPill ? (
+              <View style={styles.statusPill}>
+                <View style={styles.statusIconWrap}>
+                  <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                    <Path
+                      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                      fill="#DCFCE7"
+                      stroke="#00875A"
+                      strokeWidth={1.8}
+                    />
+                    <Path
+                      d="M12 6V12L16 14"
+                      stroke="#00875A"
+                      strokeWidth={1.8}
+                      strokeLinecap="round"
+                    />
+                  </Svg>
+                </View>
+                <Text style={styles.statusPillText}>
+                  Under verification • Track status on Dashboard
+                </Text>
               </View>
-              <Text style={styles.statusPillText}>
-                Under verification • Track status on Dashboard
-              </Text>
-            </View>
+            ) : null}
 
             {/* Primary Action Button */}
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={onGoToDashboard}
-              activeOpacity={0.85}>
-              <Text style={styles.primaryButtonText}>Go to Dashboard</Text>
-              <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M5 12H19M19 12L12 5M19 12L12 19"
-                  stroke="#FFFFFF"
-                  strokeWidth={2.4}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-            </TouchableOpacity>
+            {showButton ? (
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={handleAction}
+                activeOpacity={0.85}>
+                <Text style={styles.primaryButtonText}>{buttonText}</Text>
+                {showButtonArrow && (
+                  <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
+                    <Path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="#FFFFFF"
+                      strokeWidth={2.4}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </Svg>
+                )}
+              </TouchableOpacity>
+            ) : null}
           </Pressable>
         </Animated.View>
       </Pressable>
@@ -364,6 +422,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -0.3,
     marginBottom: 14,
+  },
+  titleMinimal: {
+    marginBottom: 24,
+    marginTop: 4,
+    paddingHorizontal: 12,
+    lineHeight: 28,
   },
   appIdBox: {
     width: '100%',

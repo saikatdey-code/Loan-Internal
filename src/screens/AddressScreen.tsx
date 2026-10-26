@@ -145,12 +145,12 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
             },
             () => {
               if (fallbackY > 0) {
-                scrollViewRef.current?.scrollTo({y: fallbackY, animated: true});
+                scrollViewRef.current?.scrollTo({ y: fallbackY, animated: true });
               }
             },
           );
         } else if (fallbackY > 0) {
-          scrollViewRef.current?.scrollTo({y: fallbackY, animated: true});
+          scrollViewRef.current?.scrollTo({ y: fallbackY, animated: true });
         }
       }, Platform.OS === 'android' ? 180 : 80);
     },
@@ -199,8 +199,8 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
                   addr.districtName?.id
                     ? String(addr.districtName.id)
                     : addr.district !== undefined && addr.district !== null
-                    ? String(addr.district)
-                    : found.id,
+                      ? String(addr.district)
+                      : found.id,
                 );
                 setDistrictLabel(found.label);
               } else {
@@ -493,272 +493,265 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
           keyboardDismissMode="on-drag">
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View>
-          {/* Address Banner Card */}
-          <View style={styles.bannerCard}>
-            <View style={styles.avatarBadge}>
-              <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M12 21C16 16.5 19 13.5 19 9.5C19 5.35786 15.866 2 12 2C8.13401 2 5 5.35786 5 9.5C5 13.5 8 16.5 12 21Z"
-                  stroke="#00875A"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <Circle cx="12" cy="9" r="3" stroke="#00875A" strokeWidth={2} />
-              </Svg>
-            </View>
-            <View style={styles.bannerTextWrapper}>
-              <Text style={styles.bannerTitle}>Address</Text>
-              <Text style={styles.bannerSubtitle}>
-                Provide the applicant's location details.
-              </Text>
-            </View>
-          </View>
+              {/* Address Banner Card */}
+              <View style={styles.bannerCard}>
+                <View style={styles.avatarBadge}>
+                  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                    <Path
+                      d="M12 21C16 16.5 19 13.5 19 9.5C19 5.35786 15.866 2 12 2C8.13401 2 5 5.35786 5 9.5C5 13.5 8 16.5 12 21Z"
+                      stroke="#00875A"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <Circle cx="12" cy="9" r="3" stroke="#00875A" strokeWidth={2} />
+                  </Svg>
+                </View>
+                <View style={styles.bannerTextWrapper}>
+                  <Text style={styles.bannerTitle}>Address</Text>
+                  <Text style={styles.bannerSubtitle}>
+                    Provide the applicant's location details.
+                  </Text>
+                </View>
+              </View>
 
-          {/* Section Divider: Address */}
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Address</Text>
-            <View style={styles.sectionLine} />
-          </View>
+              {/* Section Divider: Address */}
+              <View style={styles.sectionHeaderRow}>
+                <Text style={styles.sectionTitle}>Address</Text>
+                <View style={styles.sectionLine} />
+              </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 1: CHOOSE YOUR DISTRICT *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Choose your district <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.inputWrapper,
-                Boolean(errors.district) && styles.inputWrapperError,
-                !isDistrictEditable && styles.inputWrapperDisabled,
-              ]}
-              disabled={!isDistrictEditable || isSubmitting}
-              onPress={() => isDistrictEditable && setDistrictModalVisible(true)}
-              activeOpacity={0.85}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M12 21C16 16.5 19 13.5 19 9.5C19 5.35786 15.866 2 12 2C8.13401 2 5 5.35786 5 9.5C5 13.5 8 16.5 12 21Z"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Circle cx="12" cy="9" r="3" stroke="#64748B" strokeWidth={1.8} />
-                </Svg>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  Choose your district <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.inputWrapper,
+                    Boolean(errors.district) && styles.inputWrapperError,
+                    !isDistrictEditable && styles.inputWrapperDisabled,
+                  ]}
+                  disabled={!isDistrictEditable || isSubmitting}
+                  onPress={() => isDistrictEditable && setDistrictModalVisible(true)}
+                  activeOpacity={0.85}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M12 21C16 16.5 19 13.5 19 9.5C19 5.35786 15.866 2 12 2C8.13401 2 5 5.35786 5 9.5C5 13.5 8 16.5 12 21Z"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <Circle cx="12" cy="9" r="3" stroke="#64748B" strokeWidth={1.8} />
+                    </Svg>
+                  </View>
+                  <Text
+                    style={[
+                      styles.pressableText,
+                      !districtLabel && styles.placeholderText,
+                    ]}>
+                    {districtLabel || 'Choose your district'}
+                  </Text>
+                  <View style={styles.rightActionIcon}>
+                    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M6 9L12 15L18 9"
+                        stroke="#334155"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                </TouchableOpacity>
+                {errors.district ? (
+                  <Text style={styles.errorText}>{errors.district}</Text>
+                ) : null}
               </View>
-              <Text
-                style={[
-                  styles.pressableText,
-                  !districtLabel && styles.placeholderText,
-                ]}>
-                {districtLabel || 'Choose your district'}
-              </Text>
-              <View style={styles.rightActionIcon}>
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M6 9L12 15L18 9"
-                    stroke="#334155"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-              </View>
-            </TouchableOpacity>
-            {errors.district ? (
-              <Text style={styles.errorText}>{errors.district}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 2: LOCALITY *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Locality <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <Pressable
-              ref={localityWrapperRef}
-              style={[
-                styles.inputWrapper,
-                focusedField === 'locality' && styles.inputWrapperFocused,
-                Boolean(errors.locality) && styles.inputWrapperError,
-                !isLocalityEditable && styles.inputWrapperDisabled,
-              ]}
-              onPress={() => {
-                if (isLocalityEditable) {
-                  localityRef.current?.focus();
-                }
-              }}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M12 21C16 16.5 19 13.5 19 9.5C19 5.35786 15.866 2 12 2C8.13401 2 5 5.35786 5 9.5C5 13.5 8 16.5 12 21Z"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  Locality <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <Pressable
+                  ref={localityWrapperRef}
+                  style={[
+                    styles.inputWrapper,
+                    focusedField === 'locality' && styles.inputWrapperFocused,
+                    Boolean(errors.locality) && styles.inputWrapperError,
+                    !isLocalityEditable && styles.inputWrapperDisabled,
+                  ]}
+                  onPress={() => {
+                    if (isLocalityEditable) {
+                      localityRef.current?.focus();
+                    }
+                  }}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M12 21C16 16.5 19 13.5 19 9.5C19 5.35786 15.866 2 12 2C8.13401 2 5 5.35786 5 9.5C5 13.5 8 16.5 12 21Z"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <Circle cx="12" cy="9" r="3" stroke="#64748B" strokeWidth={1.8} />
+                    </Svg>
+                  </View>
+                  <TextInput
+                    ref={localityRef}
+                    style={[
+                      styles.textInput,
+                      !isLocalityEditable && styles.textInputDisabled,
+                    ]}
+                    value={locality}
+                    editable={isLocalityEditable && !isSubmitting}
+                    onChangeText={text => {
+                      setLocality(text);
+                      if (errors.locality) {
+                        setErrors(prev => ({ ...prev, locality: '' }));
+                      }
+                    }}
+                    placeholder="Enter locality / village"
+                    placeholderTextColor="#94A3B8"
+                    returnKeyType="next"
+                    onFocus={() => {
+                      if (isLocalityEditable) {
+                        setFocusedField('locality');
+                        scrollToInput(localityWrapperRef, 160);
+                      }
+                    }}
+                    onBlur={() => setFocusedField(null)}
                   />
-                  <Circle cx="12" cy="9" r="3" stroke="#64748B" strokeWidth={1.8} />
-                </Svg>
+                </Pressable>
+                {errors.locality ? (
+                  <Text style={styles.errorText}>{errors.locality}</Text>
+                ) : null}
               </View>
-              <TextInput
-                ref={localityRef}
-                style={[
-                  styles.textInput,
-                  !isLocalityEditable && styles.textInputDisabled,
-                ]}
-                value={locality}
-                editable={isLocalityEditable && !isSubmitting}
-                onChangeText={text => {
-                  setLocality(text);
-                  if (errors.locality) {
-                    setErrors(prev => ({ ...prev, locality: '' }));
-                  }
-                }}
-                placeholder="Enter locality / village"
-                placeholderTextColor="#94A3B8"
-                returnKeyType="next"
-                onFocus={() => {
-                  if (isLocalityEditable) {
-                    setFocusedField('locality');
-                    scrollToInput(localityWrapperRef, 160);
-                  }
-                }}
-                onBlur={() => setFocusedField(null)}
-              />
-            </Pressable>
-            {errors.locality ? (
-              <Text style={styles.errorText}>{errors.locality}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 3: GRAM PANCHAYAT / MUNICIPALITY / BLOCK *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Gram Panchayat / Municipality / Block{' '}
-              <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <Pressable
-              ref={panchayatWrapperRef}
-              style={[
-                styles.inputWrapper,
-                focusedField === 'panchayat' && styles.inputWrapperFocused,
-                Boolean(errors.panchayat) && styles.inputWrapperError,
-                !isPanchayatEditable && styles.inputWrapperDisabled,
-              ]}
-              onPress={() => {
-                if (isPanchayatEditable) {
-                  panchayatRef.current?.focus();
-                }
-              }}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M3 21H21M4 18H20M5 18V10M9 18V10M15 18V10M19 18V10M12 2L2 7H22L12 2Z"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  Gram Panchayat / Municipality / Block{' '}
+                  <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <Pressable
+                  ref={panchayatWrapperRef}
+                  style={[
+                    styles.inputWrapper,
+                    focusedField === 'panchayat' && styles.inputWrapperFocused,
+                    Boolean(errors.panchayat) && styles.inputWrapperError,
+                    !isPanchayatEditable && styles.inputWrapperDisabled,
+                  ]}
+                  onPress={() => {
+                    if (isPanchayatEditable) {
+                      panchayatRef.current?.focus();
+                    }
+                  }}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M3 21H21M4 18H20M5 18V10M9 18V10M15 18V10M19 18V10M12 2L2 7H22L12 2Z"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </Svg>
+                  </View>
+                  <TextInput
+                    ref={panchayatRef}
+                    style={[
+                      styles.textInput,
+                      !isPanchayatEditable && styles.textInputDisabled,
+                    ]}
+                    value={panchayat}
+                    editable={isPanchayatEditable && !isSubmitting}
+                    onChangeText={text => {
+                      setPanchayat(text);
+                      if (errors.panchayat) {
+                        setErrors(prev => ({ ...prev, panchayat: '' }));
+                      }
+                    }}
+                    placeholder="Enter gram panchayat / municipality / block"
+                    placeholderTextColor="#94A3B8"
+                    returnKeyType="done"
+                    onFocus={() => {
+                      if (isPanchayatEditable) {
+                        setFocusedField('panchayat');
+                        scrollToInput(panchayatWrapperRef, 260);
+                      }
+                    }}
+                    onBlur={() => setFocusedField(null)}
                   />
-                </Svg>
+                </Pressable>
+                {errors.panchayat ? (
+                  <Text style={styles.errorText}>{errors.panchayat}</Text>
+                ) : null}
               </View>
-              <TextInput
-                ref={panchayatRef}
-                style={[
-                  styles.textInput,
-                  !isPanchayatEditable && styles.textInputDisabled,
-                ]}
-                value={panchayat}
-                editable={isPanchayatEditable && !isSubmitting}
-                onChangeText={text => {
-                  setPanchayat(text);
-                  if (errors.panchayat) {
-                    setErrors(prev => ({ ...prev, panchayat: '' }));
-                  }
-                }}
-                placeholder="Enter gram panchayat / municipality / block"
-                placeholderTextColor="#94A3B8"
-                returnKeyType="done"
-                onFocus={() => {
-                  if (isPanchayatEditable) {
-                    setFocusedField('panchayat');
-                    scrollToInput(panchayatWrapperRef, 260);
-                  }
-                }}
-                onBlur={() => setFocusedField(null)}
-              />
-            </Pressable>
-            {errors.panchayat ? (
-              <Text style={styles.errorText}>{errors.panchayat}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               INFO NOTICE STRIP
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.infoStrip}>
-            <View style={styles.infoIconCircle}>
-              <Text style={styles.infoIconLetter}>i</Text>
-            </View>
-            <Text style={styles.infoStripText}>
-              Enter the address exactly as it should appear on the application.
-            </Text>
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+
+              {/* ══════════════════════════════════════════════════════
               BOTTOM BUTTON ROW: [ ← Back ] [ Save & Continue → ]
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.bottomButtonsRow}>
-            {/* Back Button */}
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleBack}
-              disabled={isSubmitting}
-              activeOpacity={0.75}>
-              <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M19 12H5M5 12L12 19M5 12L12 5"
-                  stroke="#00875A"
-                  strokeWidth={2.2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-              <Text style={styles.secondaryButtonText}>Back</Text>
-            </TouchableOpacity>
-
-            {/* Save & Continue Button */}
-            <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                isSubmitting && styles.primaryButtonDisabled,
-              ]}
-              onPress={handleSaveAndContinue}
-              disabled={isSubmitting}
-              activeOpacity={0.85}>
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <>
-                  <Text style={styles.primaryButtonText}>Save & Continue</Text>
+              <View style={styles.bottomButtonsRow}>
+                {/* Back Button */}
+                <TouchableOpacity
+                  style={styles.secondaryButton}
+                  onPress={handleBack}
+                  disabled={isSubmitting}
+                  activeOpacity={0.75}>
                   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                     <Path
-                      d="M5 12H19M19 12L12 5M19 12L12 19"
-                      stroke="#FFFFFF"
+                      d="M19 12H5M5 12L12 19M5 12L12 5"
+                      stroke="#00875A"
                       strokeWidth={2.2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </Svg>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
+                  <Text style={styles.secondaryButtonText}>Back</Text>
+                </TouchableOpacity>
+
+                {/* Save & Continue Button */}
+                <TouchableOpacity
+                  style={[
+                    styles.primaryButton,
+                    isSubmitting && styles.primaryButtonDisabled,
+                  ]}
+                  onPress={handleSaveAndContinue}
+                  disabled={isSubmitting}
+                  activeOpacity={0.85}>
+                  {isSubmitting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Text style={styles.primaryButtonText}>Save & Continue</Text>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                        <Path
+                          d="M5 12H19M19 12L12 5M19 12L12 19"
+                          stroke="#FFFFFF"
+                          strokeWidth={2.2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>

@@ -69,9 +69,6 @@ const ContactScreen: React.FC = () => {
       {/* Official Manipur Kangla Sha Watermark */}
       <WatermarkBackground opacity={0.06} />
 
-      <View style={styles.header}>
-        <Logo size="small" showSubtitle={false} />
-      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}

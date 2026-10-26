@@ -50,10 +50,6 @@ const GuidelinesScreen: React.FC = () => {
       {/* Official Manipur Kangla Sha Watermark */}
       <WatermarkBackground opacity={0.06} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Logo size="small" showSubtitle={false} />
-      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}

@@ -12,7 +12,7 @@
  * - Dual action buttons: "← Back" and "Save & Continue →"
  * - Keyboard-aware scrolling and input visibility
  */
-import React, {useState, useRef, useCallback, useEffect} from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -29,14 +29,14 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Circle, Rect} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Rect } from 'react-native-svg';
 
-import {Logo, useToast, WatermarkBackground} from '../components';
-import SelectionModal, {OptionItem} from '../components/SelectionModal';
+import { Logo, useToast, WatermarkBackground } from '../components';
+import SelectionModal, { OptionItem } from '../components/SelectionModal';
 
-import type {RootStackScreenProps} from '../types/navigation';
-import {isFieldEditable} from '../utils/fieldPermissions';
+import type { RootStackScreenProps } from '../types/navigation';
+import { isFieldEditable } from '../utils/fieldPermissions';
 import {
   getLoanId,
   setLoanId,
@@ -59,22 +59,22 @@ type ViewInstance = React.ElementRef<typeof View>;
 
 // Fallback Occupations list matching API
 const FALLBACK_OCCUPATIONS: OptionItem[] = [
-  {id: '18', label: 'Bakery Products'},
-  {id: '12', label: 'Dairy Farming'},
-  {id: '11', label: 'Fish Farming'},
-  {id: '9', label: 'Food Processing'},
-  {id: '16', label: 'Fruit Processing'},
-  {id: '8', label: 'Handicrafts'},
-  {id: '7', label: 'Handloom Weaving'},
-  {id: '14', label: 'Mushroom Cultivation'},
-  {id: '15', label: 'Nursery and Floriculture'},
-  {id: '13', label: 'Organic Farming'},
-  {id: '10', label: 'Poultry Farming'},
-  {id: '17', label: 'Spice Processing'},
-  {id: '21', label: 'Test New'},
+  { id: '18', label: 'Bakery Products' },
+  { id: '12', label: 'Dairy Farming' },
+  { id: '11', label: 'Fish Farming' },
+  { id: '9', label: 'Food Processing' },
+  { id: '16', label: 'Fruit Processing' },
+  { id: '8', label: 'Handicrafts' },
+  { id: '7', label: 'Handloom Weaving' },
+  { id: '14', label: 'Mushroom Cultivation' },
+  { id: '15', label: 'Nursery and Floriculture' },
+  { id: '13', label: 'Organic Farming' },
+  { id: '10', label: 'Poultry Farming' },
+  { id: '17', label: 'Spice Processing' },
+  { id: '21', label: 'Test New' },
 ];
 
-const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
+const EconomicActivityScreen: React.FC<Props> = ({ navigation, route }) => {
   const toast = useToast();
   const scrollViewRef = useRef<ScrollViewInstance | null>(null);
   const descInputRef = useRef<TextInputInstance | null>(null);
@@ -116,12 +116,12 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
             },
             () => {
               if (fallbackY > 0) {
-                scrollViewRef.current?.scrollTo({y: fallbackY, animated: true});
+                scrollViewRef.current?.scrollTo({ y: fallbackY, animated: true });
               }
             },
           );
         } else if (fallbackY > 0) {
-          scrollViewRef.current?.scrollTo({y: fallbackY, animated: true});
+          scrollViewRef.current?.scrollTo({ y: fallbackY, animated: true });
         }
       }, Platform.OS === 'android' ? 180 : 80);
     },
@@ -212,7 +212,7 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
           try {
             const detailsRes = await getLoanDetailsAuth(activeId);
             if (detailsRes?.success && detailsRes?.data) {
-              targetDetails = {...(targetDetails || {}), ...detailsRes.data};
+              targetDetails = { ...(targetDetails || {}), ...detailsRes.data };
               await setStoredLoanDetails(targetDetails);
             }
           } catch (fetchErr) {
@@ -381,7 +381,7 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
 
   // ─── Handle Skip ─────────────────────────────────────────────
   const handleSkip = () => {
-    navigation.navigate('MainTabs', {screen: 'Home'} as any);
+    navigation.navigate('MainTabs', { screen: 'Home' } as any);
   };
 
   return (
@@ -401,7 +401,7 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
             style={styles.backButton}
             onPress={handleBack}
             activeOpacity={0.7}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
               <Path
                 d="M19 12H5M5 12L12 19M5 12L12 5"
@@ -424,7 +424,7 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
             style={styles.skipButton}
             onPress={handleSkip}
             activeOpacity={0.7}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Text style={styles.skipText}>Skip</Text>
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
               <Path
@@ -459,255 +459,239 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
           keyboardDismissMode="on-drag">
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View>
-          {/* Banner Card */}
-          <View style={styles.bannerCard}>
-            <View style={styles.avatarBadge}>
-              <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-                {/* Briefcase Icon */}
-                <Rect
-                  x="2"
-                  y="7"
-                  width="20"
-                  height="14"
-                  rx="3"
-                  stroke="#00875A"
-                  strokeWidth={2}
-                />
-                <Path
-                  d="M16 7V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V7"
-                  stroke="#00875A"
-                  strokeWidth={2}
-                />
-                <Path
-                  d="M12 12V14"
-                  stroke="#00875A"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                />
-                <Path
-                  d="M2 12H22"
-                  stroke="#00875A"
-                  strokeWidth={1.8}
-                />
-              </Svg>
-            </View>
-            <View style={styles.bannerTextWrapper}>
-              <Text style={styles.bannerTitle}>Proposed Economic Activity</Text>
-              <Text style={styles.bannerSubtitle}>
-                Select the economic activity to be taken up with the fund.
-              </Text>
-            </View>
-          </View>
+              {/* Banner Card */}
+              <View style={styles.bannerCard}>
+                <View style={styles.avatarBadge}>
+                  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                    {/* Briefcase Icon */}
+                    <Rect
+                      x="2"
+                      y="7"
+                      width="20"
+                      height="14"
+                      rx="3"
+                      stroke="#00875A"
+                      strokeWidth={2}
+                    />
+                    <Path
+                      d="M16 7V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V7"
+                      stroke="#00875A"
+                      strokeWidth={2}
+                    />
+                    <Path
+                      d="M12 12V14"
+                      stroke="#00875A"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                    />
+                    <Path
+                      d="M2 12H22"
+                      stroke="#00875A"
+                      strokeWidth={1.8}
+                    />
+                  </Svg>
+                </View>
+                <View style={styles.bannerTextWrapper}>
+                  <Text style={styles.bannerTitle}>Proposed Economic Activity</Text>
+                  <Text style={styles.bannerSubtitle}>
+                    Select the economic activity to be taken up with the fund.
+                  </Text>
+                </View>
+              </View>
 
-          {/* Section Divider: Proposed Economic Activity */}
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Proposed Economic Activity</Text>
-            <View style={styles.sectionLine} />
-          </View>
+              {/* Section Divider: Proposed Economic Activity */}
+              <View style={styles.sectionHeaderRow}>
+                <Text style={styles.sectionTitle}>Proposed Economic Activity</Text>
+                <View style={styles.sectionLine} />
+              </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 1: ECONOMIC ACTIVITY DROPDOWN *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Economic Activity to be Taken Up with the Fund{' '}
-              <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.dropdownWrapper,
-                Boolean(activityError) && styles.inputWrapperError,
-                !isEconomicActivityEditable && styles.dropdownWrapperDisabled,
-              ]}
-              disabled={!isEconomicActivityEditable || isSubmitting}
-              onPress={() => isEconomicActivityEditable && setActivityModalVisible(true)}
-              activeOpacity={0.85}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Rect
-                    x="2"
-                    y="7"
-                    width="20"
-                    height="14"
-                    rx="3"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                  />
-                  <Path
-                    d="M16 7V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V7"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                  />
-                </Svg>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  Economic Activity to be Taken Up with the Fund{' '}
+                  <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.dropdownWrapper,
+                    Boolean(activityError) && styles.inputWrapperError,
+                    !isEconomicActivityEditable && styles.dropdownWrapperDisabled,
+                  ]}
+                  disabled={!isEconomicActivityEditable || isSubmitting}
+                  onPress={() => isEconomicActivityEditable && setActivityModalVisible(true)}
+                  activeOpacity={0.85}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Rect
+                        x="2"
+                        y="7"
+                        width="20"
+                        height="14"
+                        rx="3"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                      />
+                      <Path
+                        d="M16 7V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V7"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                      />
+                    </Svg>
+                  </View>
+                  <Text
+                    style={[
+                      styles.dropdownText,
+                      !selectedActivityLabel && styles.placeholderText,
+                    ]}
+                    numberOfLines={1}>
+                    {selectedActivityLabel || 'Choose Economic Activity'}
+                  </Text>
+                  <View style={styles.rightActionIcon}>
+                    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M6 9L12 15L18 9"
+                        stroke="#00875A"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                </TouchableOpacity>
+                {activityError ? (
+                  <Text style={styles.errorText}>{activityError}</Text>
+                ) : null}
               </View>
-              <Text
-                style={[
-                  styles.dropdownText,
-                  !selectedActivityLabel && styles.placeholderText,
-                ]}
-                numberOfLines={1}>
-                {selectedActivityLabel || 'Choose Economic Activity'}
-              </Text>
-              <View style={styles.rightActionIcon}>
-                <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M6 9L12 15L18 9"
-                    stroke="#00875A"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-              </View>
-            </TouchableOpacity>
-            {activityError ? (
-              <Text style={styles.errorText}>{activityError}</Text>
-            ) : null}
-          </View>
 
-          {/* Info Strip 1 */}
-          <View style={styles.infoStrip}>
-            <View style={styles.infoIconCircle}>
-              <Text style={styles.infoIconLetter}>i</Text>
-            </View>
-            <Text style={styles.infoStripText}>
-              Select the activity you plan to start or expand using WeManipur
-              scheme.
-            </Text>
-          </View>
+              {/* Info Strip 1 */}
 
-          {/* ══════════════════════════════════════════════════════
+
+              {/* ══════════════════════════════════════════════════════
               FIELD 2: DESCRIPTION OF PROPOSED ACTIVITY (OPTIONAL)
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Description of Proposed Activity (Optional)
-            </Text>
-            <Text style={styles.fieldHint}>
-              Provide a brief description of your proposed activity, how you
-              will use the loan and expected outcome.
-            </Text>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  Description of Proposed Activity (Optional)
+                </Text>
+                <Text style={styles.fieldHint}>
+                  Provide a brief description of your proposed activity, how you
+                  will use the loan and expected outcome.
+                </Text>
 
-            {/* Textarea Container */}
-            <Pressable
-              ref={descWrapperRef}
-              style={[
-                styles.textareaContainer,
-                isDescFocused && styles.textareaContainerFocused,
-                !isDescEditable && styles.textareaContainerDisabled,
-              ]}
-              onPress={() => {
-                if (isDescEditable) {
-                  descInputRef.current?.focus();
-                }
-              }}>
-              <View style={styles.textareaIcon} pointerEvents="none">
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Rect
-                    x="4"
-                    y="3"
-                    width="16"
-                    height="18"
-                    rx="3"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
+                {/* Textarea Container */}
+                <Pressable
+                  ref={descWrapperRef}
+                  style={[
+                    styles.textareaContainer,
+                    isDescFocused && styles.textareaContainerFocused,
+                    !isDescEditable && styles.textareaContainerDisabled,
+                  ]}
+                  onPress={() => {
+                    if (isDescEditable) {
+                      descInputRef.current?.focus();
+                    }
+                  }}>
+                  <View style={styles.textareaIcon} pointerEvents="none">
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Rect
+                        x="4"
+                        y="3"
+                        width="16"
+                        height="18"
+                        rx="3"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                      />
+                      <Path
+                        d="M8 8H16M8 12H16M8 16H12"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                  <TextInput
+                    ref={descInputRef}
+                    style={[
+                      styles.textareaInput,
+                      !isDescEditable && styles.textareaInputDisabled,
+                    ]}
+                    value={description}
+                    onChangeText={text => setDescription(text.slice(0, 500))}
+                    placeholder="Briefly describe the proposed economic activity"
+                    placeholderTextColor="#94A3B8"
+                    multiline
+                    scrollEnabled={false}
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                    editable={isDescEditable && !isSubmitting}
+                    onFocus={() => {
+                      if (isDescEditable) {
+                        setIsDescFocused(true);
+                        scrollToInput(descWrapperRef, 240);
+                      }
+                    }}
+                    onBlur={() => setIsDescFocused(false)}
                   />
-                  <Path
-                    d="M8 8H16M8 12H16M8 16H12"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
+                </Pressable>
+
+                {/* Character Counter */}
+                <Text style={styles.charCounter}>{description.length}/500</Text>
               </View>
-              <TextInput
-                ref={descInputRef}
-                style={[
-                  styles.textareaInput,
-                  !isDescEditable && styles.textareaInputDisabled,
-                ]}
-                value={description}
-                onChangeText={text => setDescription(text.slice(0, 500))}
-                placeholder="Briefly describe the proposed economic activity"
-                placeholderTextColor="#94A3B8"
-                multiline
-                scrollEnabled={false}
-                numberOfLines={4}
-                textAlignVertical="top"
-                editable={isDescEditable && !isSubmitting}
-                onFocus={() => {
-                  if (isDescEditable) {
-                    setIsDescFocused(true);
-                    scrollToInput(descWrapperRef, 240);
-                  }
-                }}
-                onBlur={() => setIsDescFocused(false)}
-              />
-            </Pressable>
 
-            {/* Character Counter */}
-            <Text style={styles.charCounter}>{description.length}/500</Text>
-          </View>
+              {/* Info Strip 2 */}
 
-          {/* Info Strip 2 */}
-          <View style={styles.infoStrip}>
-            <View style={styles.infoIconCircle}>
-              <Text style={styles.infoIconLetter}>i</Text>
-            </View>
-            <Text style={styles.infoStripText}>
-              You can provide more details in the next steps or during document
-              verification if required.
-            </Text>
-          </View>
 
-          {/* Bottom Buttons Row: [ ← Back ] [ Save & Continue → ] */}
-          <View style={styles.bottomButtonsRow}>
-            {/* Back Button */}
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleBack}
-              disabled={isSubmitting}
-              activeOpacity={0.75}>
-              <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M19 12H5M5 12L12 19M5 12L12 5"
-                  stroke="#00875A"
-                  strokeWidth={2.2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-              <Text style={styles.secondaryButtonText}>Back</Text>
-            </TouchableOpacity>
-
-            {/* Save & Continue Button */}
-            <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                isSubmitting && styles.primaryButtonDisabled,
-              ]}
-              onPress={handleSaveAndContinue}
-              disabled={isSubmitting}
-              activeOpacity={0.85}>
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <>
-                  <Text style={styles.primaryButtonText}>Save & Continue</Text>
+              {/* Bottom Buttons Row: [ ← Back ] [ Save & Continue → ] */}
+              <View style={styles.bottomButtonsRow}>
+                {/* Back Button */}
+                <TouchableOpacity
+                  style={styles.secondaryButton}
+                  onPress={handleBack}
+                  disabled={isSubmitting}
+                  activeOpacity={0.75}>
                   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                     <Path
-                      d="M5 12H19M19 12L12 5M19 12L12 19"
-                      stroke="#FFFFFF"
+                      d="M19 12H5M5 12L12 19M5 12L12 5"
+                      stroke="#00875A"
                       strokeWidth={2.2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </Svg>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
+                  <Text style={styles.secondaryButtonText}>Back</Text>
+                </TouchableOpacity>
 
-          <View style={styles.bottomSpacer} />
+                {/* Save & Continue Button */}
+                <TouchableOpacity
+                  style={[
+                    styles.primaryButton,
+                    isSubmitting && styles.primaryButtonDisabled,
+                  ]}
+                  onPress={handleSaveAndContinue}
+                  disabled={isSubmitting}
+                  activeOpacity={0.85}>
+                  {isSubmitting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Text style={styles.primaryButtonText}>Save & Continue</Text>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                        <Path
+                          d="M5 12H19M19 12L12 5M19 12L12 19"
+                          stroke="#FFFFFF"
+                          strokeWidth={2.2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.bottomSpacer} />
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
@@ -965,7 +949,7 @@ const styles = StyleSheet.create({
     borderColor: '#00875A',
     backgroundColor: '#FAFCFA',
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -1031,7 +1015,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 4,

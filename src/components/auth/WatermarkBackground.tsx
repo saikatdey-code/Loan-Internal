@@ -54,43 +54,8 @@ export interface WatermarkBackgroundProps {
   imageStyle?: StyleProp<ImageStyle>;
 }
 
-const WatermarkBackground: React.FC<WatermarkBackgroundProps> = ({
-  opacity = 0.055,
-  size,
-  variant = 'dark',
-  offsetY = 0,
-  style,
-  imageStyle,
-}) => {
-  const {width: windowWidth} = useWindowDimensions();
-
-  const emblemWidth = size ?? Math.min(windowWidth * 0.82, 330);
-  const emblemHeight = emblemWidth / ASPECT_RATIO;
-
-  const source = variant === 'brand' ? KANGLA_SHA_BRAND : KANGLA_SHA_DARK;
-
-  return (
-    <View
-      style={[styles.container, style]}
-      pointerEvents="none"
-      accessible={false}
-      importantForAccessibility="no">
-      <Image
-        source={source}
-        style={[
-          styles.image,
-          {
-            width: emblemWidth,
-            height: emblemHeight,
-            opacity,
-            transform: [{translateY: offsetY}],
-          },
-          imageStyle,
-        ]}
-        resizeMode="contain"
-      />
-    </View>
-  );
+const WatermarkBackground: React.FC<WatermarkBackgroundProps> = () => {
+  return null;
 };
 
 const styles = StyleSheet.create({

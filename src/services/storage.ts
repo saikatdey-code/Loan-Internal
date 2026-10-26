@@ -178,6 +178,7 @@ export const clearAll = async (): Promise<void> => {
   try {
     const keys = Object.values(STORAGE_KEYS);
     await Promise.all(keys.map(key => AsyncStorage.removeItem(key)));
+    await AsyncStorage.clear();
   } catch (error) {
     console.error('[Storage] Failed to clear storage:', error);
   }

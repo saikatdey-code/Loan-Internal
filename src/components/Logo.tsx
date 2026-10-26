@@ -33,39 +33,8 @@ const LOGO_SIZES = {
   large: {width: 225, height: 190},
 };
 
-const Logo: React.FC<LogoProps> = ({
-  size = 'medium',
-  showSubtitle = true,
-  width: customWidth,
-  height: customHeight,
-  style,
-  imageStyle,
-}) => {
-  // If no subtitle is shown (like in navigation top bars), use header-friendly dimensions if size is small
-  const defaultSize =
-    !showSubtitle && size === 'small' ? LOGO_SIZES.header : LOGO_SIZES[size];
-
-  const width = customWidth ?? defaultSize.width;
-  const height = customHeight ?? defaultSize.height;
-
-  return (
-    <View style={[styles.container, style]}>
-      <Image
-        source={require('../assets/images/logo.png')}
-        style={[styles.logoImage, {width, height}, imageStyle]}
-        resizeMode="contain"
-      />
-      {showSubtitle && (
-        <Text
-          style={[
-            styles.subtitle,
-            size === 'small' && styles.subtitleSmall,
-          ]}>
-          WOMEN EMPOWERMENT MANIPUR
-        </Text>
-      )}
-    </View>
-  );
+const Logo: React.FC<LogoProps> = () => {
+  return null;
 };
 
 const styles = StyleSheet.create({

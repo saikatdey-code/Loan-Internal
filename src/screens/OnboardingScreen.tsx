@@ -3,7 +3,7 @@
  * Features centered header logo, top-right skip button, hero typography,
  * edge-to-edge illustration, and curved bottom sheet with pagination dots and CTAs.
  */
-import React, {useRef, useState, useCallback, useEffect} from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,12 +17,12 @@ import {
   NativeScrollEvent,
   ImageSourcePropType,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {Logo, Button, PaginationDots} from '../components';
-import {setHasCompletedOnboarding} from '../services/storage';
-import type {RootStackScreenProps} from '../types/navigation';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, PaginationDots } from '../components';
+import { setHasCompletedOnboarding } from '../services/storage';
+import type { RootStackScreenProps } from '../types/navigation';
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ILLUSTRATION_ASPECT_RATIO = 896 / 700;
 const ILLUSTRATION_HEIGHT = Math.round(SCREEN_WIDTH / ILLUSTRATION_ASPECT_RATIO);
 
@@ -69,22 +69,18 @@ const SLIDES: SlideData[] = [
 ];
 
 // ─── Component ───────────────────────────────────────────────
-const OnboardingScreen: React.FC<Props> = ({navigation}) => {
+const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList<SlideData>>(null);
 
-  const handleApply = useCallback(() => {
-    navigation.navigate('AadhaarAuth');
-  }, [navigation]);
-
   const handleSkip = useCallback(async () => {
     await setHasCompletedOnboarding(true);
-    navigation.navigate('Auth', {screen: 'LoginMethod'});
+    navigation.navigate('Auth', { screen: 'LoginMethod' });
   }, [navigation]);
 
   const handleLogin = useCallback(async () => {
     await setHasCompletedOnboarding(true);
-    navigation.navigate('Auth', {screen: 'LoginMethod'});
+    navigation.navigate('Auth', { screen: 'LoginMethod' });
   }, [navigation]);
 
   const handleDotPress = useCallback((index: number) => {
@@ -106,7 +102,7 @@ const OnboardingScreen: React.FC<Props> = ({navigation}) => {
   );
 
   // ─── Render Slide ──────────────────────────────────────────
-  const renderSlide = useCallback(({item}: {item: SlideData}) => {
+  const renderSlide = useCallback(({ item }: { item: SlideData }) => {
     return (
       <View style={styles.slide}>
         {/* Title & Description */}
@@ -134,14 +130,13 @@ const OnboardingScreen: React.FC<Props> = ({navigation}) => {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Fixed Top Header: Centered Logo + Top-Right Skip */}
+      {/* Top Header: Top-Right Skip */}
       <View style={styles.header}>
-        <Logo size="small" showSubtitle={true} />
         {activeIndex < SLIDES.length - 1 && (
           <TouchableOpacity
             style={styles.skipButton}
             onPress={handleSkip}
-            hitSlop={{top: 14, bottom: 14, left: 14, right: 14}}
+            hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
             activeOpacity={0.7}>
             <Text style={styles.skipText}>
               Skip <Text style={styles.skipChevron}>›</Text>
@@ -191,21 +186,12 @@ const OnboardingScreen: React.FC<Props> = ({navigation}) => {
 
         {/* Primary CTA */}
         <Button
-          title="Apply for Financial Assistance"
+          title="Login"
           rightIcon={<Text style={styles.buttonArrow}>→</Text>}
-          onPress={handleApply}
+          onPress={handleLogin}
           variant="primary"
           style={styles.ctaButton}
           textStyle={styles.ctaButtonText}
-        />
-
-        {/* Secondary CTA */}
-        <Button
-          title="Login"
-          onPress={handleLogin}
-          variant="secondary"
-          style={styles.loginButton}
-          textStyle={styles.loginButtonText}
         />
       </View>
     </SafeAreaView>
@@ -221,22 +207,19 @@ const styles = StyleSheet.create({
   },
   // Header
   header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 4,
-    paddingBottom: 4,
-    position: 'relative',
-    minHeight: 110,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
+    minHeight: 44,
   },
   skipButton: {
-    position: 'absolute',
-    right: 20,
-    top: 14,
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 8,
-    zIndex: 10,
   },
   skipText: {
     fontSize: 14,
@@ -316,7 +299,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: -32,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: -3},
+    shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 8,
@@ -332,7 +315,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00875A',
     marginBottom: 12,
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 3,

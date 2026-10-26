@@ -3,15 +3,15 @@
  * [ Home ] [ Guidelines ] [ Help ] [ Faq ] [ Contact ]
  */
 import React from 'react';
-import {View, Text, StyleSheet, Platform} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Svg, {Path, Circle} from 'react-native-svg';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Svg, { Path, Circle } from 'react-native-svg';
 import HomeScreen from '../screens/HomeScreen';
 import GuidelinesScreen from '../screens/GuidelinesScreen';
 import HelpScreen from '../screens/HelpScreen';
 import FaqScreen from '../screens/FaqScreen';
 import ContactScreen from '../screens/ContactScreen';
-import type {MainTabParamList} from '../types/navigation';
+import type { MainTabParamList } from '../types/navigation';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -19,7 +19,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 const TabIcon: React.FC<{
   routeName: keyof MainTabParamList;
   focused: boolean;
-}> = ({routeName, focused}) => {
+}> = ({ routeName, focused }) => {
   const color = focused ? '#00875A' : '#64748B';
 
   switch (routeName) {
@@ -124,7 +124,7 @@ const TabIcon: React.FC<{
 const TabLabel: React.FC<{
   focused: boolean;
   title: string;
-}> = ({focused, title}) => {
+}> = ({ focused, title }) => {
   return (
     <View style={styles.labelContainer}>
       <Text
@@ -139,38 +139,38 @@ const TabLabel: React.FC<{
   );
 };
 
-const renderHomeIcon = ({focused}: {focused: boolean}) => (
+const renderHomeIcon = ({ focused }: { focused: boolean }) => (
   <TabIcon routeName="Home" focused={focused} />
 );
-const renderHomeLabel = ({focused}: {focused: boolean}) => (
+const renderHomeLabel = ({ focused }: { focused: boolean }) => (
   <TabLabel focused={focused} title="Home" />
 );
 
-const renderGuidelinesIcon = ({focused}: {focused: boolean}) => (
+const renderGuidelinesIcon = ({ focused }: { focused: boolean }) => (
   <TabIcon routeName="Guidelines" focused={focused} />
 );
-const renderGuidelinesLabel = ({focused}: {focused: boolean}) => (
+const renderGuidelinesLabel = ({ focused }: { focused: boolean }) => (
   <TabLabel focused={focused} title="Guidelines" />
 );
 
-const renderHelpIcon = ({focused}: {focused: boolean}) => (
+const renderHelpIcon = ({ focused }: { focused: boolean }) => (
   <TabIcon routeName="Help" focused={focused} />
 );
-const renderHelpLabel = ({focused}: {focused: boolean}) => (
+const renderHelpLabel = ({ focused }: { focused: boolean }) => (
   <TabLabel focused={focused} title="Help" />
 );
 
-const renderFaqIcon = ({focused}: {focused: boolean}) => (
+const renderFaqIcon = ({ focused }: { focused: boolean }) => (
   <TabIcon routeName="Faq" focused={focused} />
 );
-const renderFaqLabel = ({focused}: {focused: boolean}) => (
+const renderFaqLabel = ({ focused }: { focused: boolean }) => (
   <TabLabel focused={focused} title="Faq" />
 );
 
-const renderContactIcon = ({focused}: {focused: boolean}) => (
+const renderContactIcon = ({ focused }: { focused: boolean }) => (
   <TabIcon routeName="Contact" focused={focused} />
 );
-const renderContactLabel = ({focused}: {focused: boolean}) => (
+const renderContactLabel = ({ focused }: { focused: boolean }) => (
   <TabLabel focused={focused} title="Contact" />
 );
 
@@ -193,38 +193,38 @@ const MainTabNavigator: React.FC = () => {
           tabBarLabel: renderHomeLabel,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Guidelines"
         component={GuidelinesScreen}
         options={{
           tabBarIcon: renderGuidelinesIcon,
           tabBarLabel: renderGuidelinesLabel,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Help"
         component={HelpScreen}
         options={{
           tabBarIcon: renderHelpIcon,
           tabBarLabel: renderHelpLabel,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Faq"
         component={FaqScreen}
         options={{
           tabBarIcon: renderFaqIcon,
           tabBarLabel: renderFaqLabel,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Contact"
         component={ContactScreen}
         options={{
           tabBarIcon: renderContactIcon,
           tabBarLabel: renderContactLabel,
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 24 : 8,
     elevation: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
   },

@@ -1,4 +1,4 @@
-package com.wemanipur
+package com.abcd
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

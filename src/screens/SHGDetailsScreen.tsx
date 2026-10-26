@@ -10,7 +10,7 @@
  * - SHG Bank Passbook Copy upload (required, <= 200 KB)
  * - Multi-part form submission to POST /api/loan/shg
  */
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -29,11 +29,11 @@ import {
   TouchableWithoutFeedback,
   Modal,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Circle, Rect} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Rect } from 'react-native-svg';
 
-import {RootStackScreenProps} from '../types/navigation';
-import {isFieldEditable} from '../utils/fieldPermissions';
+import { RootStackScreenProps } from '../types/navigation';
+import { isFieldEditable } from '../utils/fieldPermissions';
 import {
   Logo,
   CalendarModal,
@@ -42,14 +42,14 @@ import {
   useToast,
   WatermarkBackground,
 } from '../components';
-import {SelectedDocument} from '../components/DocumentUploadModal';
+import { SelectedDocument } from '../components/DocumentUploadModal';
 import {
   getLoanId,
   getStoredLoanDetails,
   setStoredLoanDetails,
 } from '../services/storage';
-import {getLoanDetailsAuth, submitSHGDetails} from '../api/loan';
-import {checkInternetConnection, showNoInternetAlert} from '../utils';
+import { getLoanDetailsAuth, submitSHGDetails } from '../api/loan';
+import { checkInternetConnection, showNoInternetAlert } from '../utils';
 
 type Props = RootStackScreenProps<'SHGDetails'>;
 
@@ -79,7 +79,7 @@ const formatDisplayDate = (raw?: string | null): string => {
       const year = d.getFullYear();
       return `${day}-${month}-${year}`;
     }
-  } catch {}
+  } catch { }
   return str;
 };
 
@@ -133,7 +133,7 @@ type ScrollViewInstance = React.ElementRef<typeof ScrollView>;
 type TextInputInstance = React.ElementRef<typeof TextInput>;
 type ViewInstance = React.ElementRef<typeof View>;
 
-const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
+const SHGDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
   const toast = useToast();
 
   // ─── Form State ──────────────────────────────────────────────
@@ -185,7 +185,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
   const handleOpenPreview = (doc: SelectedDocument | null, title: string) => {
     if (!doc) return;
     setImageLoadError(false);
-    setViewingDoc({title, doc});
+    setViewingDoc({ title, doc });
   };
 
   // Errors
@@ -234,12 +234,12 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
             },
             () => {
               if (fallbackY > 0) {
-                scrollViewRef.current?.scrollTo({y: fallbackY, animated: true});
+                scrollViewRef.current?.scrollTo({ y: fallbackY, animated: true });
               }
             },
           );
         } else if (fallbackY > 0) {
-          scrollViewRef.current?.scrollTo({y: fallbackY, animated: true});
+          scrollViewRef.current?.scrollTo({ y: fallbackY, animated: true });
         }
       }, Platform.OS === 'android' ? 180 : 80);
     },
@@ -403,23 +403,23 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
     const newErrors: Record<string, string> = {};
 
     if (!shgName.trim()) {
-      newErrors.shgName = 'Name of SHG is required';
+      newErrors.shgName = 'APUNBA is required';
     }
 
     if (!shgId.trim()) {
-      newErrors.shgId = 'SHG ID number is required';
+      newErrors.shgId = 'APUNBA Id is required';
     }
 
     if (!dateOfFormation.trim()) {
-      newErrors.dateOfFormation = 'Date of formation of SHG is required';
+      newErrors.dateOfFormation = 'D-F is required';
     }
 
     if (!certificate) {
-      newErrors.certificate = 'SHG certificate / membership proof is required';
+      newErrors.certificate = 'C is required';
     }
 
     if (!bankCopy) {
-      newErrors.bankCopy = 'SHG bank passbook copy is required';
+      newErrors.bankCopy = 'P is required';
     }
 
     setErrors(newErrors);
@@ -479,17 +479,17 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
         dateOfFormation: apiDateOfFormation,
         certificate: certificate
           ? {
-              uri: certificate.uri,
-              fileName: certificate.fileName,
-              type: certificate.type,
-            }
+            uri: certificate.uri,
+            fileName: certificate.fileName,
+            type: certificate.type,
+          }
           : null,
         bankCopy: bankCopy
           ? {
-              uri: bankCopy.uri,
-              fileName: bankCopy.fileName,
-              type: bankCopy.type,
-            }
+            uri: bankCopy.uri,
+            fileName: bankCopy.fileName,
+            type: bankCopy.type,
+          }
           : null,
       });
 
@@ -565,7 +565,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
 
   // ─── Handle Skip ─────────────────────────────────────────────
   const handleSkip = () => {
-    navigation.navigate('MainTabs', {screen: 'Home'} as any);
+    navigation.navigate('MainTabs', { screen: 'Home' } as any);
   };
 
   return (
@@ -585,7 +585,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
             style={styles.backButton}
             onPress={handleBack}
             activeOpacity={0.7}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
               <Path
                 d="M19 12H5M5 12L12 19M5 12L12 5"
@@ -608,7 +608,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
             style={styles.skipButton}
             onPress={handleSkip}
             activeOpacity={0.7}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Text style={styles.skipText}>Skip</Text>
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
               <Path
@@ -643,611 +643,600 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           keyboardDismissMode="on-drag">
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View>
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               HEADER TITLE & SUBTITLE
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.screenHeader}>
-            <Text style={styles.screenTitle}>SHG Details</Text>
-            <Text style={styles.screenSubtitle}>
-              Provide the applicant's Self Help Group membership details.
-            </Text>
-          </View>
+              <View style={styles.screenHeader}>
+                <Text style={styles.screenTitle}>APUNBA Details</Text>
 
-          {/* ══════════════════════════════════════════════════════
+              </View>
+
+              {/* ══════════════════════════════════════════════════════
               SECTION DIVIDER: SHG MEMBERSHIP
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>SHG Membership</Text>
-            <View style={styles.sectionLine} />
-          </View>
+              <View style={styles.sectionHeaderRow}>
+                <Text style={styles.sectionTitle}> Membership</Text>
+                <View style={styles.sectionLine} />
+              </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 1: NAME OF SHG *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Name of SHG <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <Pressable
-              ref={shgNameWrapperRef}
-              style={[
-                styles.inputWrapper,
-                focusedField === 'shgName' && styles.inputWrapperFocused,
-                Boolean(errors.shgName) && styles.inputWrapperError,
-                !isShgNameEditable && styles.inputWrapperDisabled,
-              ]}
-              onPress={() => {
-                if (isShgNameEditable) {
-                  shgNameRef.current?.focus();
-                }
-              }}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  APUNBA <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <Pressable
+                  ref={shgNameWrapperRef}
+                  style={[
+                    styles.inputWrapper,
+                    focusedField === 'shgName' && styles.inputWrapperFocused,
+                    Boolean(errors.shgName) && styles.inputWrapperError,
+                    !isShgNameEditable && styles.inputWrapperDisabled,
+                  ]}
+                  onPress={() => {
+                    if (isShgNameEditable) {
+                      shgNameRef.current?.focus();
+                    }
+                  }}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                      />
+                      <Circle
+                        cx="12"
+                        cy="11"
+                        r="3.5"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                      />
+                    </Svg>
+                  </View>
+                  <TextInput
+                    ref={shgNameRef}
+                    style={[
+                      styles.textInput,
+                      !isShgNameEditable && styles.textInputDisabled,
+                    ]}
+                    value={shgName}
+                    editable={isShgNameEditable && !isSubmitting}
+                    onChangeText={text => {
+                      setShgName(text);
+                      if (errors.shgName) {
+                        setErrors(prev => ({ ...prev, shgName: '' }));
+                      }
+                    }}
+                    placeholder="Enter APUNBA name"
+                    placeholderTextColor="#94A3B8"
+                    autoCapitalize="words"
+                    returnKeyType="next"
+                    onFocus={() => {
+                      if (isShgNameEditable) {
+                        setFocusedField('shgName');
+                        scrollToInput(shgNameWrapperRef, 120);
+                      }
+                    }}
+                    onBlur={() => setFocusedField(null)}
                   />
-                  <Circle
-                    cx="12"
-                    cy="11"
-                    r="3.5"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                  />
-                </Svg>
+                </Pressable>
+                {errors.shgName ? (
+                  <Text style={styles.errorText}>{errors.shgName}</Text>
+                ) : null}
               </View>
-              <TextInput
-                ref={shgNameRef}
-                style={[
-                  styles.textInput,
-                  !isShgNameEditable && styles.textInputDisabled,
-                ]}
-                value={shgName}
-                editable={isShgNameEditable && !isSubmitting}
-                onChangeText={text => {
-                  setShgName(text);
-                  if (errors.shgName) {
-                    setErrors(prev => ({...prev, shgName: ''}));
-                  }
-                }}
-                placeholder="Enter SHG name"
-                placeholderTextColor="#94A3B8"
-                autoCapitalize="words"
-                returnKeyType="next"
-                onFocus={() => {
-                  if (isShgNameEditable) {
-                    setFocusedField('shgName');
-                    scrollToInput(shgNameWrapperRef, 120);
-                  }
-                }}
-                onBlur={() => setFocusedField(null)}
-              />
-            </Pressable>
-            {errors.shgName ? (
-              <Text style={styles.errorText}>{errors.shgName}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 2: SHG ID NUMBER *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              SHG ID Number <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <Pressable
-              ref={shgIdWrapperRef}
-              style={[
-                styles.inputWrapper,
-                focusedField === 'shgId' && styles.inputWrapperFocused,
-                Boolean(errors.shgId) && styles.inputWrapperError,
-                !isShgIdEditable && styles.inputWrapperDisabled,
-              ]}
-              onPress={() => {
-                if (isShgIdEditable) {
-                  shgIdRef.current?.focus();
-                }
-              }}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  Id <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <Pressable
+                  ref={shgIdWrapperRef}
+                  style={[
+                    styles.inputWrapper,
+                    focusedField === 'shgId' && styles.inputWrapperFocused,
+                    Boolean(errors.shgId) && styles.inputWrapperError,
+                    !isShgIdEditable && styles.inputWrapperDisabled,
+                  ]}
+                  onPress={() => {
+                    if (isShgIdEditable) {
+                      shgIdRef.current?.focus();
+                    }
+                  }}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <Path
+                        d="M14 2V8H20"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <Path
+                        d="M16 13H8M16 17H8M10 9H8"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                  <TextInput
+                    ref={shgIdRef}
+                    style={[
+                      styles.textInput,
+                      !isShgIdEditable && styles.textInputDisabled,
+                    ]}
+                    value={shgId}
+                    editable={isShgIdEditable && !isSubmitting}
+                    onChangeText={text => {
+                      setShgId(text);
+                      if (errors.shgId) {
+                        setErrors(prev => ({ ...prev, shgId: '' }));
+                      }
+                    }}
+                    placeholder="Enter APUNBA Id"
+                    placeholderTextColor="#94A3B8"
+                    autoCapitalize="characters"
+                    returnKeyType="next"
+                    onFocus={() => {
+                      if (isShgIdEditable) {
+                        setFocusedField('shgId');
+                        scrollToInput(shgIdWrapperRef, 200);
+                      }
+                    }}
+                    onBlur={() => setFocusedField(null)}
                   />
-                  <Path
-                    d="M14 2V8H20"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M16 13H8M16 17H8M10 9H8"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
+                </Pressable>
+                {errors.shgId ? (
+                  <Text style={styles.errorText}>{errors.shgId}</Text>
+                ) : null}
               </View>
-              <TextInput
-                ref={shgIdRef}
-                style={[
-                  styles.textInput,
-                  !isShgIdEditable && styles.textInputDisabled,
-                ]}
-                value={shgId}
-                editable={isShgIdEditable && !isSubmitting}
-                onChangeText={text => {
-                  setShgId(text);
-                  if (errors.shgId) {
-                    setErrors(prev => ({...prev, shgId: ''}));
-                  }
-                }}
-                placeholder="Enter SHG ID number"
-                placeholderTextColor="#94A3B8"
-                autoCapitalize="characters"
-                returnKeyType="next"
-                onFocus={() => {
-                  if (isShgIdEditable) {
-                    setFocusedField('shgId');
-                    scrollToInput(shgIdWrapperRef, 200);
-                  }
-                }}
-                onBlur={() => setFocusedField(null)}
-              />
-            </Pressable>
-            {errors.shgId ? (
-              <Text style={styles.errorText}>{errors.shgId}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 3: DATE OF FORMATION OF SHG *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              Date of Formation of SHG <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.inputWrapper,
-                focusedField === 'dateOfFormation' &&
-                  styles.inputWrapperFocused,
-                Boolean(errors.dateOfFormation) && styles.inputWrapperError,
-                !isDateOfFormationEditable && styles.inputWrapperDisabled,
-              ]}
-              disabled={!isDateOfFormationEditable || isSubmitting}
-              onPress={() => isDateOfFormationEditable && setCalendarVisible(true)}
-              activeOpacity={0.85}>
-              <View style={styles.fieldIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="18"
-                    rx="3"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                  />
-                  <Path
-                    d="M16 2V6M8 2V6M3 10H21"
-                    stroke="#64748B"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  D-F <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.inputWrapper,
+                    focusedField === 'dateOfFormation' &&
+                    styles.inputWrapperFocused,
+                    Boolean(errors.dateOfFormation) && styles.inputWrapperError,
+                    !isDateOfFormationEditable && styles.inputWrapperDisabled,
+                  ]}
+                  disabled={!isDateOfFormationEditable || isSubmitting}
+                  onPress={() => isDateOfFormationEditable && setCalendarVisible(true)}
+                  activeOpacity={0.85}>
+                  <View style={styles.fieldIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="18"
+                        rx="3"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                      />
+                      <Path
+                        d="M16 2V6M8 2V6M3 10H21"
+                        stroke="#64748B"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                  <Text
+                    style={[
+                      styles.pressableText,
+                      !dateOfFormation && styles.placeholderText,
+                    ]}>
+                    {dateOfFormation || 'DD-MM-YYYY'}
+                  </Text>
+                  <View style={styles.rightActionIcon}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="18"
+                        rx="3"
+                        stroke="#334155"
+                        strokeWidth={1.8}
+                      />
+                      <Path
+                        d="M16 2V6M8 2V6M3 10H21"
+                        stroke="#334155"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                </TouchableOpacity>
+                {errors.dateOfFormation ? (
+                  <Text style={styles.errorText}>{errors.dateOfFormation}</Text>
+                ) : null}
               </View>
-              <Text
-                style={[
-                  styles.pressableText,
-                  !dateOfFormation && styles.placeholderText,
-                ]}>
-                {dateOfFormation || 'DD-MM-YYYY'}
-              </Text>
-              <View style={styles.rightActionIcon}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="18"
-                    rx="3"
-                    stroke="#334155"
-                    strokeWidth={1.8}
-                  />
-                  <Path
-                    d="M16 2V6M8 2V6M3 10H21"
-                    stroke="#334155"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-              </View>
-            </TouchableOpacity>
-            {errors.dateOfFormation ? (
-              <Text style={styles.errorText}>{errors.dateOfFormation}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+              {/* ══════════════════════════════════════════════════════
               FIELD 4: SHG CERTIFICATE / MEMBERSHIP PROOF *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              SHG Certificate / Membership Proof{' '}
-              <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <View
-              style={[
-                styles.uploadBox,
-                Boolean(errors.certificate) && styles.uploadBoxError,
-              ]}>
-              {/* Left: Thumbnail Preview or Icon Badge */}
-              {certificate && isImageFile(certificate) ? (
-                <TouchableOpacity
-                  style={styles.uploadThumbnailWrap}
-                  onPress={() =>
-                    handleOpenPreview(certificate, 'SHG Certificate / Proof')
-                  }
-                  activeOpacity={0.8}>
-                  <Image
-                    source={{uri: resolveDocUri(certificate.uri)}}
-                    style={styles.uploadThumbnail}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.thumbnailZoomBadge}>
-                    <Svg width={9} height={9} viewBox="0 0 24 24" fill="none">
-                      <Path
-                        d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
-                        stroke="#FFFFFF"
-                        strokeWidth={2.2}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  C <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <View
+                  style={[
+                    styles.uploadBox,
+                    Boolean(errors.certificate) && styles.uploadBoxError,
+                  ]}>
+                  {/* Left: Thumbnail Preview or Icon Badge */}
+                  {certificate && isImageFile(certificate) ? (
+                    <TouchableOpacity
+                      style={styles.uploadThumbnailWrap}
+                      onPress={() =>
+                        handleOpenPreview(certificate, 'C')
+                      }
+                      activeOpacity={0.8}>
+                      <Image
+                        source={{ uri: resolveDocUri(certificate.uri) }}
+                        style={styles.uploadThumbnail}
+                        resizeMode="cover"
                       />
-                      <Circle cx="12" cy="12" r="3" stroke="#FFFFFF" strokeWidth={2.2} />
-                    </Svg>
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={styles.uploadIconBadge}
-                  onPress={() =>
-                    certificate &&
-                    handleOpenPreview(certificate, 'SHG Certificate / Proof')
-                  }
-                  activeOpacity={certificate ? 0.75 : 1}>
-                  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-                    <Rect
-                      x="3"
-                      y="3"
-                      width="18"
-                      height="18"
-                      rx="4"
-                      stroke="#059669"
-                      strokeWidth={1.8}
-                    />
-                    <Circle cx="8.5" cy="8.5" r="2" fill="#059669" />
-                    <Path
-                      d="M21 15L16 10L5 21"
-                      stroke="#059669"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </TouchableOpacity>
-              )}
+                      <View style={styles.thumbnailZoomBadge}>
+                        <Svg width={9} height={9} viewBox="0 0 24 24" fill="none">
+                          <Path
+                            d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                            stroke="#FFFFFF"
+                            strokeWidth={2.2}
+                          />
+                          <Circle cx="12" cy="12" r="3" stroke="#FFFFFF" strokeWidth={2.2} />
+                        </Svg>
+                      </View>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.uploadIconBadge}
+                      onPress={() =>
+                        certificate &&
+                        handleOpenPreview(certificate, 'C')
+                      }
+                      activeOpacity={certificate ? 0.75 : 1}>
+                      <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                        <Rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="4"
+                          stroke="#059669"
+                          strokeWidth={1.8}
+                        />
+                        <Circle cx="8.5" cy="8.5" r="2" fill="#059669" />
+                        <Path
+                          d="M21 15L16 10L5 21"
+                          stroke="#059669"
+                          strokeWidth={1.8}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                    </TouchableOpacity>
+                  )}
 
-              {/* Middle: Details (tapping opens preview if uploaded) */}
-              <TouchableOpacity
-                style={styles.uploadDetails}
-                onPress={() =>
-                  certificate &&
-                  handleOpenPreview(certificate, 'SHG Certificate / Proof')
-                }
-                disabled={!certificate}
-                activeOpacity={0.7}>
-                <Text style={styles.uploadHeading} numberOfLines={1}>
-                  {certificate ? certificate.fileName : 'Upload file'}
-                </Text>
-                <Text style={styles.uploadSubtext}>
-                  {certificate
-                    ? `${(certificate.fileSize / 1024).toFixed(0)} KB · Tap to view`
-                    : 'JPG, PNG or PDF - Maximum 200 KB'}
-                </Text>
-              </TouchableOpacity>
-
-              {/* Right: Actions Row */}
-              <View style={styles.uploadActionsRow}>
-                {certificate ? (
+                  {/* Middle: Details (tapping opens preview if uploaded) */}
                   <TouchableOpacity
-                    style={styles.viewDocButton}
+                    style={styles.uploadDetails}
                     onPress={() =>
-                      handleOpenPreview(certificate, 'SHG Certificate / Proof')
+                      certificate &&
+                      handleOpenPreview(certificate, 'C')
                     }
-                    activeOpacity={0.75}>
-                    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
-                      <Path
-                        d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
-                        stroke="#00875A"
-                        strokeWidth={2.2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <Circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                        stroke="#00875A"
-                        strokeWidth={2.2}
-                      />
-                    </Svg>
-                    <Text style={styles.viewDocText}>View</Text>
-                  </TouchableOpacity>
-                ) : null}
-
-                {isCertificateEditable ? (
-                  <TouchableOpacity
-                    style={styles.chooseFileButton}
-                    onPress={() => setCertificateModalVisible(true)}
-                    activeOpacity={0.75}>
-                    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-                      <Path
-                        d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15"
-                        stroke="#00875A"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <Path
-                        d="M17 8L12 3M12 3L7 8M12 3V15"
-                        stroke="#00875A"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </Svg>
-                    <Text style={styles.chooseFileText}>
-                      {certificate ? 'Change' : 'Choose File'}
+                    disabled={!certificate}
+                    activeOpacity={0.7}>
+                    <Text style={styles.uploadHeading} numberOfLines={1}>
+                      {certificate ? certificate.fileName : 'Upload file'}
+                    </Text>
+                    <Text style={styles.uploadSubtext}>
+                      {certificate
+                        ? `${(certificate.fileSize / 1024).toFixed(0)} KB · Tap to view`
+                        : 'JPG, PNG or PDF - Maximum 200 KB'}
                     </Text>
                   </TouchableOpacity>
-                ) : (
-                  <View
-                    style={[
-                      styles.chooseFileButton,
-                      styles.chooseFileButtonDisabled,
-                    ]}>
-                    <Text style={styles.chooseFileTextDisabled}>Locked</Text>
-                  </View>
-                )}
-              </View>
-            </View>
-            {errors.certificate ? (
-              <Text style={styles.errorText}>{errors.certificate}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+                  {/* Right: Actions Row */}
+                  <View style={styles.uploadActionsRow}>
+                    {certificate ? (
+                      <TouchableOpacity
+                        style={styles.viewDocButton}
+                        onPress={() =>
+                          handleOpenPreview(certificate, 'C')
+                        }
+                        activeOpacity={0.75}>
+                        <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
+                          <Path
+                            d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                            stroke="#00875A"
+                            strokeWidth={2.2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <Circle
+                            cx="12"
+                            cy="12"
+                            r="3"
+                            stroke="#00875A"
+                            strokeWidth={2.2}
+                          />
+                        </Svg>
+                        <Text style={styles.viewDocText}>View</Text>
+                      </TouchableOpacity>
+                    ) : null}
+
+                    {isCertificateEditable ? (
+                      <TouchableOpacity
+                        style={styles.chooseFileButton}
+                        onPress={() => setCertificateModalVisible(true)}
+                        activeOpacity={0.75}>
+                        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                          <Path
+                            d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15"
+                            stroke="#00875A"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <Path
+                            d="M17 8L12 3M12 3L7 8M12 3V15"
+                            stroke="#00875A"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </Svg>
+                        <Text style={styles.chooseFileText}>
+                          {certificate ? 'Change' : 'Choose File'}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View
+                        style={[
+                          styles.chooseFileButton,
+                          styles.chooseFileButtonDisabled,
+                        ]}>
+                        <Text style={styles.chooseFileTextDisabled}>Locked</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+                {errors.certificate ? (
+                  <Text style={styles.errorText}>{errors.certificate}</Text>
+                ) : null}
+              </View>
+
+              {/* ══════════════════════════════════════════════════════
               FIELD 5: SHG BANK PASSBOOK COPY *
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>
-              SHG Bank Passbook Copy <Text style={styles.redAsterisk}>*</Text>
-            </Text>
-            <View
-              style={[
-                styles.uploadBox,
-                Boolean(errors.bankCopy) && styles.uploadBoxError,
-              ]}>
-              {/* Left: Thumbnail Preview or Icon Badge */}
-              {bankCopy && isImageFile(bankCopy) ? (
-                <TouchableOpacity
-                  style={styles.uploadThumbnailWrap}
-                  onPress={() =>
-                    handleOpenPreview(bankCopy, 'SHG Bank Passbook Copy')
-                  }
-                  activeOpacity={0.8}>
-                  <Image
-                    source={{uri: resolveDocUri(bankCopy.uri)}}
-                    style={styles.uploadThumbnail}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.thumbnailZoomBadge}>
-                    <Svg width={9} height={9} viewBox="0 0 24 24" fill="none">
-                      <Path
-                        d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
-                        stroke="#FFFFFF"
-                        strokeWidth={2.2}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  B-P <Text style={styles.redAsterisk}>*</Text>
+                </Text>
+                <View
+                  style={[
+                    styles.uploadBox,
+                    Boolean(errors.bankCopy) && styles.uploadBoxError,
+                  ]}>
+                  {/* Left: Thumbnail Preview or Icon Badge */}
+                  {bankCopy && isImageFile(bankCopy) ? (
+                    <TouchableOpacity
+                      style={styles.uploadThumbnailWrap}
+                      onPress={() =>
+                        handleOpenPreview(bankCopy, 'P')
+                      }
+                      activeOpacity={0.8}>
+                      <Image
+                        source={{ uri: resolveDocUri(bankCopy.uri) }}
+                        style={styles.uploadThumbnail}
+                        resizeMode="cover"
                       />
-                      <Circle cx="12" cy="12" r="3" stroke="#FFFFFF" strokeWidth={2.2} />
-                    </Svg>
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={styles.uploadIconBadge}
-                  onPress={() =>
-                    bankCopy &&
-                    handleOpenPreview(bankCopy, 'SHG Bank Passbook Copy')
-                  }
-                  activeOpacity={bankCopy ? 0.75 : 1}>
-                  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-                    <Rect
-                      x="3"
-                      y="3"
-                      width="18"
-                      height="18"
-                      rx="4"
-                      stroke="#059669"
-                      strokeWidth={1.8}
-                    />
-                    <Circle cx="8.5" cy="8.5" r="2" fill="#059669" />
-                    <Path
-                      d="M21 15L16 10L5 21"
-                      stroke="#059669"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </TouchableOpacity>
-              )}
+                      <View style={styles.thumbnailZoomBadge}>
+                        <Svg width={9} height={9} viewBox="0 0 24 24" fill="none">
+                          <Path
+                            d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                            stroke="#FFFFFF"
+                            strokeWidth={2.2}
+                          />
+                          <Circle cx="12" cy="12" r="3" stroke="#FFFFFF" strokeWidth={2.2} />
+                        </Svg>
+                      </View>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.uploadIconBadge}
+                      onPress={() =>
+                        bankCopy &&
+                        handleOpenPreview(bankCopy, 'P')
+                      }
+                      activeOpacity={bankCopy ? 0.75 : 1}>
+                      <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                        <Rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="4"
+                          stroke="#059669"
+                          strokeWidth={1.8}
+                        />
+                        <Circle cx="8.5" cy="8.5" r="2" fill="#059669" />
+                        <Path
+                          d="M21 15L16 10L5 21"
+                          stroke="#059669"
+                          strokeWidth={1.8}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                    </TouchableOpacity>
+                  )}
 
-              {/* Middle: Details (tapping opens preview if uploaded) */}
-              <TouchableOpacity
-                style={styles.uploadDetails}
-                onPress={() =>
-                  bankCopy &&
-                  handleOpenPreview(bankCopy, 'SHG Bank Passbook Copy')
-                }
-                disabled={!bankCopy}
-                activeOpacity={0.7}>
-                <Text style={styles.uploadHeading} numberOfLines={1}>
-                  {bankCopy ? bankCopy.fileName : 'Upload file'}
-                </Text>
-                <Text style={styles.uploadSubtext}>
-                  {bankCopy
-                    ? `${(bankCopy.fileSize / 1024).toFixed(0)} KB · Tap to view`
-                    : 'JPG, PNG or PDF - Maximum 200 KB'}
-                </Text>
-              </TouchableOpacity>
-
-              {/* Right: Actions Row */}
-              <View style={styles.uploadActionsRow}>
-                {bankCopy ? (
+                  {/* Middle: Details (tapping opens preview if uploaded) */}
                   <TouchableOpacity
-                    style={styles.viewDocButton}
+                    style={styles.uploadDetails}
                     onPress={() =>
-                      handleOpenPreview(bankCopy, 'SHG Bank Passbook Copy')
+                      bankCopy &&
+                      handleOpenPreview(bankCopy, 'P')
                     }
-                    activeOpacity={0.75}>
-                    <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
-                      <Path
-                        d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
-                        stroke="#00875A"
-                        strokeWidth={2.2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <Circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                        stroke="#00875A"
-                        strokeWidth={2.2}
-                      />
-                    </Svg>
-                    <Text style={styles.viewDocText}>View</Text>
-                  </TouchableOpacity>
-                ) : null}
-
-                {isBankCopyEditable ? (
-                  <TouchableOpacity
-                    style={styles.chooseFileButton}
-                    onPress={() => setBankCopyModalVisible(true)}
-                    activeOpacity={0.75}>
-                    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-                      <Path
-                        d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15"
-                        stroke="#00875A"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <Path
-                        d="M17 8L12 3M12 3L7 8M12 3V15"
-                        stroke="#00875A"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </Svg>
-                    <Text style={styles.chooseFileText}>
-                      {bankCopy ? 'Change' : 'Choose File'}
+                    disabled={!bankCopy}
+                    activeOpacity={0.7}>
+                    <Text style={styles.uploadHeading} numberOfLines={1}>
+                      {bankCopy ? bankCopy.fileName : 'Upload file'}
+                    </Text>
+                    <Text style={styles.uploadSubtext}>
+                      {bankCopy
+                        ? `${(bankCopy.fileSize / 1024).toFixed(0)} KB · Tap to view`
+                        : 'JPG, PNG or PDF - Maximum 200 KB'}
                     </Text>
                   </TouchableOpacity>
-                ) : (
-                  <View
-                    style={[
-                      styles.chooseFileButton,
-                      styles.chooseFileButtonDisabled,
-                    ]}>
-                    <Text style={styles.chooseFileTextDisabled}>Locked</Text>
-                  </View>
-                )}
-              </View>
-            </View>
-            {errors.bankCopy ? (
-              <Text style={styles.errorText}>{errors.bankCopy}</Text>
-            ) : null}
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+                  {/* Right: Actions Row */}
+                  <View style={styles.uploadActionsRow}>
+                    {bankCopy ? (
+                      <TouchableOpacity
+                        style={styles.viewDocButton}
+                        onPress={() =>
+                          handleOpenPreview(bankCopy, 'P')
+                        }
+                        activeOpacity={0.75}>
+                        <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
+                          <Path
+                            d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                            stroke="#00875A"
+                            strokeWidth={2.2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <Circle
+                            cx="12"
+                            cy="12"
+                            r="3"
+                            stroke="#00875A"
+                            strokeWidth={2.2}
+                          />
+                        </Svg>
+                        <Text style={styles.viewDocText}>View</Text>
+                      </TouchableOpacity>
+                    ) : null}
+
+                    {isBankCopyEditable ? (
+                      <TouchableOpacity
+                        style={styles.chooseFileButton}
+                        onPress={() => setBankCopyModalVisible(true)}
+                        activeOpacity={0.75}>
+                        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                          <Path
+                            d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15"
+                            stroke="#00875A"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <Path
+                            d="M17 8L12 3M12 3L7 8M12 3V15"
+                            stroke="#00875A"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </Svg>
+                        <Text style={styles.chooseFileText}>
+                          {bankCopy ? 'Change' : 'Choose File'}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View
+                        style={[
+                          styles.chooseFileButton,
+                          styles.chooseFileButtonDisabled,
+                        ]}>
+                        <Text style={styles.chooseFileTextDisabled}>Locked</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+                {errors.bankCopy ? (
+                  <Text style={styles.errorText}>{errors.bankCopy}</Text>
+                ) : null}
+              </View>
+
+              {/* ══════════════════════════════════════════════════════
               INFO NOTICE STRIP
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.infoStrip}>
-            <View style={styles.infoIconCircle}>
-              <Text style={styles.infoIconLetter}>i</Text>
-            </View>
-            <Text style={styles.infoStripText}>
-              Upload both SHG identification documents: certificate/membership
-              proof and bank passbook copy.
-            </Text>
-          </View>
 
-          {/* ══════════════════════════════════════════════════════
+
+              {/* ══════════════════════════════════════════════════════
               BOTTOM ACTION BUTTONS (Back + Save & Continue)
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.bottomButtonsRow}>
-            {/* Back Button */}
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleBack}
-              disabled={isSubmitting}
-              activeOpacity={0.75}>
-              <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M19 12H5M5 12L12 19M5 12L12 5"
-                  stroke="#00875A"
-                  strokeWidth={2.2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-              <Text style={styles.secondaryButtonText}>Back</Text>
-            </TouchableOpacity>
-
-            {/* Save & Continue Button */}
-            <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                isSubmitting && styles.primaryButtonDisabled,
-              ]}
-              onPress={handleSaveAndContinue}
-              disabled={isSubmitting}
-              activeOpacity={0.85}>
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <>
-                  <Text style={styles.primaryButtonText}>Save & Continue</Text>
+              <View style={styles.bottomButtonsRow}>
+                {/* Back Button */}
+                <TouchableOpacity
+                  style={styles.secondaryButton}
+                  onPress={handleBack}
+                  disabled={isSubmitting}
+                  activeOpacity={0.75}>
                   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                     <Path
-                      d="M5 12H19M19 12L12 5M19 12L12 19"
-                      stroke="#FFFFFF"
+                      d="M19 12H5M5 12L12 19M5 12L12 5"
+                      stroke="#00875A"
                       strokeWidth={2.2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </Svg>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
+                  <Text style={styles.secondaryButtonText}>Back</Text>
+                </TouchableOpacity>
+
+                {/* Save & Continue Button */}
+                <TouchableOpacity
+                  style={[
+                    styles.primaryButton,
+                    isSubmitting && styles.primaryButtonDisabled,
+                  ]}
+                  onPress={handleSaveAndContinue}
+                  disabled={isSubmitting}
+                  activeOpacity={0.85}>
+                  {isSubmitting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Text style={styles.primaryButtonText}>Save & Continue</Text>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                        <Path
+                          d="M5 12H19M19 12L12 5M19 12L12 19"
+                          stroke="#FFFFFF"
+                          strokeWidth={2.2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
@@ -1265,7 +1254,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
         onSelectDate={d => {
           setDateOfFormation(d);
           if (errors.dateOfFormation) {
-            setErrors(prev => ({...prev, dateOfFormation: ''}));
+            setErrors(prev => ({ ...prev, dateOfFormation: '' }));
           }
         }}
         onClose={() => setCalendarVisible(false)}
@@ -1274,14 +1263,14 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
       {/* SHG Certificate Upload Modal */}
       <DocumentUploadModal
         visible={certificateModalVisible}
-        title="SHG Certificate / Proof"
+        title="C"
         subtitle="JPG, PNG or PDF · Maximum 200 KB"
         sampleFileName="certificate.png"
         maxSizeKb={200}
         onDocumentSelected={doc => {
           setCertificate(doc);
           if (errors.certificate) {
-            setErrors(prev => ({...prev, certificate: ''}));
+            setErrors(prev => ({ ...prev, certificate: '' }));
           }
         }}
         onClose={() => setCertificateModalVisible(false)}
@@ -1290,14 +1279,14 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
       {/* SHG Bank Passbook Upload Modal */}
       <DocumentUploadModal
         visible={bankCopyModalVisible}
-        title="SHG Bank Passbook Copy"
+        title="P"
         subtitle="JPG, PNG or PDF · Maximum 200 KB"
         sampleFileName="bankCopy.png"
         maxSizeKb={200}
         onDocumentSelected={doc => {
           setBankCopy(doc);
           if (errors.bankCopy) {
-            setErrors(prev => ({...prev, bankCopy: ''}));
+            setErrors(prev => ({ ...prev, bankCopy: '' }));
           }
         }}
         onClose={() => setBankCopyModalVisible(false)}
@@ -1340,7 +1329,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
                   setImageLoadError(false);
                 }}
                 activeOpacity={0.7}
-                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                   <Path
                     d="M18 6L6 18M6 6L18 18"
@@ -1358,7 +1347,7 @@ const SHGDetailsScreen: React.FC<Props> = ({navigation, route}) => {
               {viewingDoc && isImageFile(viewingDoc.doc) && !imageLoadError ? (
                 <View style={styles.previewImageContainer}>
                   <Image
-                    source={{uri: resolveDocUri(viewingDoc.doc.uri)}}
+                    source={{ uri: resolveDocUri(viewingDoc.doc.uri) }}
                     style={styles.previewModalImage}
                     resizeMode="contain"
                     onError={() => setImageLoadError(true)}
@@ -1564,7 +1553,7 @@ const styles = StyleSheet.create({
     borderColor: '#00875A',
     backgroundColor: '#FAFCFA',
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -1739,7 +1728,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 10},
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 16,
     elevation: 10,
@@ -1941,7 +1930,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,

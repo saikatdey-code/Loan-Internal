@@ -23,10 +23,10 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
           if (parentNav) {
             parentNav.reset({
               index: 0,
-              routes: [{name: 'Onboarding'}],
+              routes: [{name: 'Auth', params: {screen: 'Login'}}],
             });
           } else {
-            navigation.navigate('Onboarding');
+            (navigation as any).navigate('Auth', {screen: 'Login'});
           }
         },
       },

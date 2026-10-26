@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>WEmanipur</string>
+	<string>abcd</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -34,11 +34,11 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>WEManipur requires location access to help verify your residency in Manipur for scheme eligibility.</string>
+	<string>abcd requires location access to help verify residency for scheme eligibility.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>WEmanipur needs access to your camera to capture applicant photograph.</string>
+	<string>abcd needs access to your camera to capture applicant photograph.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>WEmanipur needs access to your photo library to select applicant photograph.</string>
+	<string>abcd needs access to your photo library to select applicant photograph.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

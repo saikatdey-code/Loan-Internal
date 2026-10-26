@@ -16,6 +16,8 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Svg, {Path, Circle, Rect} from 'react-native-svg';
@@ -37,6 +39,8 @@ interface ApplicationLoginScreenProps {
   onBack?: () => void;
 }
 
+type ScrollViewInstance = React.ElementRef<typeof ScrollView>;
+
 const RESEND_INTERVAL = 60; // 60 seconds countdown
 
 const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
@@ -45,6 +49,7 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
   onBack,
 }) => {
   const toast = useToast();
+  const scrollViewRef = useRef<ScrollViewInstance | null>(null);
   const [step, setStep] = useState<ApplicationLoginStep>('APPLICATION_ID');
   const [applicationId, setApplicationId] = useState('');
   const [applicationIdError, setApplicationIdError] = useState('');
@@ -55,6 +60,31 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
   const [isResending, setIsResending] = useState(false);
   const [timer, setTimer] = useState(RESEND_INTERVAL);
   const [canResend, setCanResend] = useState(false);
+
+  // Track keyboard state for smooth scrolling on Android
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, e => {
+      setIsKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setIsKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -117,7 +147,7 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await applicantLogin({applicationId: cleanAppId});
+      const response = await applicantLogin({applicationId: cleanAppId, isDraft: true});
 
       if (response && (response.success === true || response.status === true)) {
         toast.success(response.message || 'Otp send successfully');
@@ -168,7 +198,7 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
       if (resolvedPhone) {
         response = await resendOtp({phone: resolvedPhone});
       } else {
-        response = await applicantLogin({applicationId: cleanAppId});
+        response = await applicantLogin({applicationId: cleanAppId, isDraft: true});
       }
 
       if (response && (response.status === true || response.success === true)) {
@@ -279,9 +309,23 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
         <AuthHeader showBack={true} onBack={handleBack} />
 
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          ref={scrollViewRef}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isKeyboardVisible && styles.scrollContentWithKeyboard,
+            {
+              paddingBottom: isKeyboardVisible
+                ? (Platform.OS === 'android' ? 140 : 60)
+                : Layout.spacing['2xl'],
+            },
+          ]}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled">
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          bounces={true}
+          overScrollMode="always">
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.scrollInner}>
           {/* ════════════════════════════════════════════════════════
               STEP 1: LOGIN WITH APPLICATION NUMBER
              ════════════════════════════════════════════════════════ */}
@@ -604,6 +648,8 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
               </View>
             </View>
           )}
+            </View>
+          </TouchableWithoutFeedback>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -623,6 +669,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Layout.spacing.xl,
     paddingBottom: Layout.spacing['2xl'],
     justifyContent: 'center',
+  },
+  scrollContentWithKeyboard: {
+    justifyContent: 'flex-start',
+    paddingTop: Platform.OS === 'android' ? 36 : 20,
+  },
+  scrollInner: {
+    width: '100%',
   },
   stepContainer: {
     width: '100%',

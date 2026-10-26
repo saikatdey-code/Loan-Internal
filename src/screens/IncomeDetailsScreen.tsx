@@ -14,7 +14,7 @@
  * - API call: POST /api/loan/details with payload:
  *     { familyIncome, otherFamilyIncome, loanId }
  */
-import React, {useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -27,13 +27,13 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Circle, Ellipse} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Ellipse } from 'react-native-svg';
 
-import {Logo, useToast, WatermarkBackground} from '../components';
+import { Logo, useToast, WatermarkBackground } from '../components';
 import SelectionModal from '../components/SelectionModal';
-import type {RootStackScreenProps} from '../types/navigation';
-import {isFieldEditable} from '../utils/fieldPermissions';
+import type { RootStackScreenProps } from '../types/navigation';
+import { isFieldEditable } from '../utils/fieldPermissions';
 import {
   getLoanId,
   getStoredLoanDetails,
@@ -45,7 +45,7 @@ import {
   getLoanDetailsAuth,
   getLoanList,
 } from '../api/loan';
-import {checkInternetConnection, showNoInternetAlert} from '../utils';
+import { checkInternetConnection, showNoInternetAlert } from '../utils';
 
 type Props = RootStackScreenProps<'IncomeDetails'>;
 
@@ -78,7 +78,7 @@ const INCOME_OPTIONS: IncomeOption[] = [
   },
 ];
 
-const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
+const IncomeDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
   const toast = useToast();
 
   const [loanStatus, setLoanStatus] = useState<string>(
@@ -297,7 +297,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
 
   // ─── Handle Skip ─────────────────────────────────────────────
   const handleSkip = () => {
-    navigation.navigate('MainTabs', {screen: 'Home'} as any);
+    navigation.navigate('MainTabs', { screen: 'Home' } as any);
   };
 
   return (
@@ -316,7 +316,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           style={styles.backButton}
           onPress={handleBack}
           activeOpacity={0.7}
-          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
             <Path
               d="M19 12H5M5 12L12 19M5 12L12 5"
@@ -339,7 +339,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           style={styles.skipButton}
           onPress={handleSkip}
           activeOpacity={0.7}
-          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.skipText}>Skip</Text>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
             <Path
@@ -482,15 +482,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           {/* ══════════════════════════════════════════════════════
               INFO NOTICE STRIP
              ══════════════════════════════════════════════════════ */}
-          <View style={styles.infoStrip}>
-            <View style={styles.infoIconCircle}>
-              <Text style={styles.infoIconLetter}>i</Text>
-            </View>
-            <Text style={styles.infoStripText}>
-              Income details provided will be verified during the application
-              review progress.
-            </Text>
-          </View>
+
 
           {/* ══════════════════════════════════════════════════════
               BOTTOM BUTTON ROW: [ ← Back ] [ Save & Continue → ]
@@ -686,7 +678,7 @@ const styles = StyleSheet.create({
     borderColor: '#00875A',
     backgroundColor: '#F0FDF4',
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -826,7 +818,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 4,

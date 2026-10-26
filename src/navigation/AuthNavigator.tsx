@@ -35,7 +35,7 @@ const LoginMethodWrapper: React.FC<AuthStackScreenProps<'LoginMethod'>> = ({
         if (navigation.canGoBack()) {
           navigation.goBack();
         } else {
-          navigation.replace('Onboarding');
+          navigation.replace('Login');
         }
       }}
     />
@@ -55,13 +55,9 @@ const LoginWrapper: React.FC<AuthStackScreenProps<'Login'>> = ({
       onNavigateToApplicationLogin={() => {
         navigation.navigate('ApplicationLogin');
       }}
-      onBackToOnboarding={() => {
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        } else {
-          navigation.replace('LoginMethod');
-        }
-      }}
+      onBackToOnboarding={
+        navigation.canGoBack() ? () => navigation.goBack() : undefined
+      }
     />
   );
 };
@@ -75,13 +71,17 @@ const ApplicationLoginWrapper: React.FC<
         navigation.replace('MainTabs', undefined);
       }}
       onChooseAnotherMethod={() => {
-        navigation.navigate('LoginMethod');
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.replace('Login');
+        }
       }}
       onBack={() => {
         if (navigation.canGoBack()) {
           navigation.goBack();
         } else {
-          navigation.replace('LoginMethod');
+          navigation.replace('Login');
         }
       }}
     />
@@ -91,13 +91,13 @@ const ApplicationLoginWrapper: React.FC<
 const AuthNavigator: React.FC = () => {
   return (
     <Stack.Navigator
-      initialRouteName="LoginMethod"
+      initialRouteName="Login"
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',
       }}>
-      <Stack.Screen name="LoginMethod" component={LoginMethodWrapper} />
       <Stack.Screen name="Login" component={LoginWrapper} />
+      <Stack.Screen name="LoginMethod" component={LoginMethodWrapper} />
       <Stack.Screen
         name="ApplicationLogin"
         component={ApplicationLoginWrapper}

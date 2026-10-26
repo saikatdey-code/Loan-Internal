@@ -1,4 +1,4 @@
-package com.wemanipur
+package com.abcd
 
 import android.app.Application
 import com.facebook.react.PackageList

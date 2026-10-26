@@ -1,184 +1,197 @@
 /**
- * SplashScreen — High-end, clean launch screen for WEmanipur.
- * Features:
- * - Pure, minimal white background (no background shapes/auras behind the logo)
- * - Silk-smooth Apple cubic-bezier logo entrance (fade + scale + float-up)
- * - Staggered subtitle reveal
- * - Official Government of Manipur authority badge at the bottom
- * - Smooth exit crossfade
+ * SplashScreen — High-end, clean launch screen.
+ * Displays an animated "Hello" front and center with smooth Apple-grade choreography.
  */
 import React, {useEffect, useRef} from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   StatusBar,
   Animated,
   Easing,
-  Dimensions,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Logo} from '../components';
-import {getHasCompletedOnboarding, getToken} from '../services/storage';
+import {getToken} from '../services/storage';
 import type {RootStackScreenProps} from '../types/navigation';
 
 type Props = RootStackScreenProps<'Splash'>;
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const LETTERS = ['H', 'e', 'l', 'l', 'o'];
 
 const SplashScreen: React.FC<Props> = ({navigation}) => {
-  // 1. Logo Entrance & Physics
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const logoScale = useRef(new Animated.Value(0.85)).current;
-  const logoTranslateY = useRef(new Animated.Value(18)).current;
+  // Staggered letters entrance animation values
+  const letterAnims = useRef(
+    LETTERS.map(() => ({
+      opacity: new Animated.Value(0),
+      translateY: new Animated.Value(32),
+      scale: new Animated.Value(0.7),
+    })),
+  ).current;
 
-  // 2. Subtitle Reveal
-  const subtitleOpacity = useRef(new Animated.Value(0)).current;
-  const subtitleTranslateY = useRef(new Animated.Value(10)).current;
+  // Soft ambient halo glow
+  const auraOpacity = useRef(new Animated.Value(0)).current;
+  const auraScale = useRef(new Animated.Value(0.6)).current;
 
-  // 3. Official Badge & Global Exit
-  const footerOpacity = useRef(new Animated.Value(0)).current;
-  const footerTranslateY = useRef(new Animated.Value(12)).current;
+  // Gentle floating / breathing idle animation
+  const floatY = useRef(new Animated.Value(0)).current;
+
+  // Screen exit crossfade + slight zoom
   const screenOpacity = useRef(new Animated.Value(1)).current;
+  const screenScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Entrance Choreography
-    Animated.parallel([
-      // Logo Entrance: Silky Apple Ease-Out Float & Scale
-      Animated.timing(logoOpacity, {
+    // 1. Aura glow entrance
+    const auraAnimation = Animated.parallel([
+      Animated.timing(auraOpacity, {
+        toValue: 0.8,
+        duration: 700,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.spring(auraScale, {
         toValue: 1,
-        duration: 750,
-        easing: Easing.bezier(0.16, 1, 0.3, 1),
+        tension: 40,
+        friction: 6,
         useNativeDriver: true,
       }),
-      Animated.timing(logoScale, {
-        toValue: 1,
-        duration: 850,
-        easing: Easing.bezier(0.16, 1, 0.3, 1),
-        useNativeDriver: true,
-      }),
-      Animated.timing(logoTranslateY, {
-        toValue: 0,
-        duration: 850,
-        easing: Easing.bezier(0.16, 1, 0.3, 1),
-        useNativeDriver: true,
-      }),
+    ]);
 
-      // Staggered Subtitle Reveal
-      Animated.sequence([
-        Animated.delay(250),
+    // 2. Staggered letters entrance (delightful spring bounce)
+    const letterAnimations = Animated.stagger(
+      80,
+      letterAnims.map(anim =>
         Animated.parallel([
-          Animated.timing(subtitleOpacity, {
+          Animated.timing(anim.opacity, {
             toValue: 1,
-            duration: 650,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-          }),
-          Animated.timing(subtitleTranslateY, {
-            toValue: 0,
-            duration: 650,
-            easing: Easing.bezier(0.16, 1, 0.3, 1),
-            useNativeDriver: true,
-          }),
-        ]),
-      ]),
-
-      // Staggered Government Badge Entrance
-      Animated.sequence([
-        Animated.delay(400),
-        Animated.parallel([
-          Animated.timing(footerOpacity, {
-            toValue: 1,
-            duration: 650,
+            duration: 380,
             easing: Easing.out(Easing.quad),
             useNativeDriver: true,
           }),
-          Animated.timing(footerTranslateY, {
+          Animated.spring(anim.translateY, {
             toValue: 0,
-            duration: 650,
-            easing: Easing.bezier(0.16, 1, 0.3, 1),
+            tension: 75,
+            friction: 7,
+            useNativeDriver: true,
+          }),
+          Animated.spring(anim.scale, {
+            toValue: 1,
+            tension: 80,
+            friction: 6,
             useNativeDriver: true,
           }),
         ]),
-      ]),
-    ]).start();
+      ),
+    );
 
-    // Smooth Exit & Navigation Transition after 2.4s
+    // 3. Gentle breathing idle float
+    const floatAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatY, {
+          toValue: -8,
+          duration: 1000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatY, {
+          toValue: 0,
+          duration: 1000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    // Run entrance sequence
+    Animated.parallel([
+      auraAnimation,
+      Animated.sequence([
+        Animated.delay(120),
+        letterAnimations,
+      ]),
+    ]).start(() => {
+      floatAnimation.start();
+    });
+
+    // 4. Smooth Exit & Navigation Transition after 2.4s
     const timer = setTimeout(async () => {
-      Animated.timing(screenOpacity, {
-        toValue: 0,
-        duration: 280,
-        easing: Easing.in(Easing.ease),
-        useNativeDriver: true,
-      }).start(async () => {
+      floatAnimation.stop();
+      Animated.parallel([
+        Animated.timing(screenOpacity, {
+          toValue: 0,
+          duration: 300,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(screenScale, {
+          toValue: 1.06,
+          duration: 300,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]).start(async () => {
         const token = await getToken();
         if (token && token.trim().length > 0) {
           navigation.replace('MainTabs', undefined);
         } else {
-          navigation.replace('Onboarding', undefined);
+          navigation.replace('Auth', { screen: 'Login' });
         }
       });
     }, 2400);
 
-    return () => clearTimeout(timer);
-  }, [
-    navigation,
-    logoOpacity,
-    logoScale,
-    logoTranslateY,
-    subtitleOpacity,
-    subtitleTranslateY,
-    footerOpacity,
-    footerTranslateY,
-    screenOpacity,
-  ]);
+    return () => {
+      clearTimeout(timer);
+      floatAnimation.stop();
+    };
+  }, [navigation, letterAnims, auraOpacity, auraScale, floatY, screenOpacity, screenScale]);
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Animated.View style={[styles.mainWrapper, {opacity: screenOpacity}]}>
-        {/* Center Brand Identity (Pure white background, no shapes/auras behind) */}
-        <View style={styles.content}>
-          <Animated.View
-            style={[
-              styles.logoContainer,
-              {
-                opacity: logoOpacity,
-                transform: [
-                  {scale: logoScale},
-                  {translateY: logoTranslateY},
-                ],
-              },
-            ]}>
-            <Logo size="large" showSubtitle={false} />
-          </Animated.View>
-
-          {/* Subtitle with staggered reveal */}
-          <Animated.View
-            style={[
-              styles.subtitleContainer,
-              {
-                opacity: subtitleOpacity,
-                transform: [{translateY: subtitleTranslateY}],
-              },
-            ]}>
-            <Text style={styles.subtitle}>WOMEN EMPOWERMENT MANIPUR</Text>
-          </Animated.View>
-        </View>
-
-        {/* Bottom Section: Official Government Authority Badge */}
+      <Animated.View
+        style={[
+          styles.screenWrapper,
+          {
+            opacity: screenOpacity,
+            transform: [{scale: screenScale}],
+          },
+        ]}>
         <Animated.View
           style={[
-            styles.footerContainer,
+            styles.helloContainer,
             {
-              opacity: footerOpacity,
-              transform: [{translateY: footerTranslateY}],
+              transform: [{translateY: floatY}],
             },
           ]}>
-          <View style={styles.footerBadge}>
-            <View style={styles.footerGreenDot} />
-            <Text style={styles.footerText}>GOVERNMENT OF MANIPUR</Text>
+          {/* Ambient soft glow aura */}
+          <Animated.View
+            style={[
+              styles.aura,
+              {
+                opacity: auraOpacity,
+                transform: [{scale: auraScale}],
+              },
+            ]}
+          />
+
+          {/* Staggered animated letters */}
+          <View style={styles.lettersRow}>
+            {LETTERS.map((char, index) => (
+              <Animated.Text
+                key={index}
+                style={[
+                  styles.letter,
+                  {
+                    opacity: letterAnims[index].opacity,
+                    transform: [
+                      {translateY: letterAnims[index].translateY},
+                      {scale: letterAnims[index].scale},
+                    ],
+                  },
+                ]}>
+                {char}
+              </Animated.Text>
+            ))}
           </View>
         </Animated.View>
       </Animated.View>
@@ -191,60 +204,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  mainWrapper: {
+  screenWrapper: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  content: {
+  helloContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 40,
+    width: 260,
+    height: 180,
   },
-  logoContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subtitleContainer: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  subtitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#6B7A8D',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  footerContainer: {
+  aura: {
     position: 'absolute',
-    bottom: 28,
-    alignItems: 'center',
-    width: SCREEN_WIDTH,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#E8F5EF',
   },
-  footerBadge: {
+  lettersRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    gap: 7,
+    justifyContent: 'center',
   },
-  footerGreenDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#00875A',
-  },
-  footerText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#475569',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
+  letter: {
+    fontSize: 58,
+    fontWeight: '800',
+    color: '#0F172A',
+    letterSpacing: -1.2,
+    includeFontPadding: false,
   },
 });
 

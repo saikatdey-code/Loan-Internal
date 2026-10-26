@@ -10,7 +10,7 @@
  * - Divider: "New Applicant?"
  * - "Apply Now" button with user-plus icon
  */
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -19,13 +19,13 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Circle, Rect} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Rect } from 'react-native-svg';
 
-import {AuthHeader, WatermarkBackground} from '../../components/auth';
-import {Colors} from '../../constants/colors';
-import {Typography} from '../../constants/typography';
-import {Layout} from '../../constants/layout';
+import { AuthHeader, WatermarkBackground } from '../../components/auth';
+import { Colors } from '../../constants/colors';
+import { Typography } from '../../constants/typography';
+import { Layout } from '../../constants/layout';
 
 interface LoginMethodScreenProps {
   onSelectMobile: () => void;
@@ -151,70 +151,7 @@ const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({
           </Svg>
         </TouchableOpacity>
 
-        {/* Option 2: Login with Application Number */}
-        <TouchableOpacity
-          style={[
-            styles.card,
-            selectedMethod === 'APPLICATION'
-              ? styles.cardSelected
-              : styles.cardUnselected,
-          ]}
-          onPress={() => setSelectedMethod('APPLICATION')}
-          activeOpacity={0.85}>
-          {/* Radio Button */}
-          <View
-            style={[
-              styles.radioOuter,
-              selectedMethod === 'APPLICATION' && styles.radioOuterSelected,
-            ]}>
-            {selectedMethod === 'APPLICATION' && <View style={styles.radioInner} />}
-          </View>
 
-          {/* Icon Circle */}
-          <View style={[styles.iconCircle, styles.applicationIconCircle]}>
-            <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                stroke="#0284C7"
-                strokeWidth={1.9}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <Path
-                d="M14 2V8H20"
-                stroke="#0284C7"
-                strokeWidth={1.9}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <Path
-                d="M8 12H16M8 16H14"
-                stroke="#0284C7"
-                strokeWidth={1.9}
-                strokeLinecap="round"
-              />
-            </Svg>
-          </View>
-
-          {/* Text Information */}
-          <View style={styles.cardTextContainer}>
-            <Text style={styles.cardTitle}>Login with Application Number</Text>
-            <Text style={styles.cardSubtitle}>
-              Enter your application number to receive an OTP
-            </Text>
-          </View>
-
-          {/* Right Chevron */}
-          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <Path
-              d="M9 18L15 12L9 6"
-              stroke="#0284C7"
-              strokeWidth={2.2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </Svg>
-        </TouchableOpacity>
 
         {/* Primary Button: Continue */}
         <TouchableOpacity
@@ -233,36 +170,10 @@ const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({
           </Svg>
         </TouchableOpacity>
 
-        {/* "New Applicant?" Divider */}
-        <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>New Applicant?</Text>
-          <View style={styles.dividerLine} />
-        </View>
+
 
         {/* Apply Now Button */}
-        <TouchableOpacity
-          style={styles.applyNowButton}
-          onPress={onApplyNow}
-          activeOpacity={0.85}>
-          <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-            <Path
-              d="M16 21V19C16 16.7909 14.2091 15 12 15H5C2.79086 15 1 16.7909 1 19V21"
-              stroke="#FFFFFF"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <Circle cx="8.5" cy="7" r="4" stroke="#FFFFFF" strokeWidth={2} />
-            <Path
-              d="M19 8V14M22 11H16"
-              stroke="#FFFFFF"
-              strokeWidth={2}
-              strokeLinecap="round"
-            />
-          </Svg>
-          <Text style={styles.applyNowButtonText}>Apply Now</Text>
-        </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );

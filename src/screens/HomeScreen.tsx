@@ -568,12 +568,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               if (parentNav) {
                 (parentNav as any).reset({
                   index: 1,
-                  routes: [{ name: 'Onboarding' }, { name: 'AadhaarAuth' }],
+                  routes: [{ name: 'Auth', params: { screen: 'Login' } }, { name: 'AadhaarAuth' }],
                 });
               } else {
                 (navigation as any).reset({
                   index: 1,
-                  routes: [{ name: 'Onboarding' }, { name: 'AadhaarAuth' }],
+                  routes: [{ name: 'Auth', params: { screen: 'Login' } }, { name: 'AadhaarAuth' }],
                 });
               }
             } catch (e) {
@@ -766,37 +766,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             />
           </Svg>
         </TouchableOpacity>
-
-        {/* Centered WEmanipur Brand Logo */}
-        <View style={styles.logoCenter}>
-          <Logo size="small" showSubtitle={false} />
-        </View>
-
-        {/* Notification Bell with Badge */}
-        <TouchableOpacity
-          style={styles.notificationButton}
-          onPress={handleNotificationPress}
-          activeOpacity={0.7}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Path
-              d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
-              stroke="#0F172A"
-              strokeWidth={1.8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <Path
-              d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
-              stroke="#0F172A"
-              strokeWidth={1.8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </Svg>
-          {/* Notification red dot badge */}
-          {/* <View style={styles.notificationDot} /> */}
-        </TouchableOpacity>
       </View>
 
       {/* ══════════════════════════════════════════════════════
@@ -807,23 +776,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         {/* Shield Scheme Badge */}
-        <View style={styles.schemeTag}>
-          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-            <Path
-              d="M12 22S4 18 4 12V5L12 2L20 5V12C20 18 12 22 12 22Z"
-              stroke="#00875A"
-              strokeWidth={2}
-            />
-            <Path
-              d="M9 12L11 14L15 10"
-              stroke="#00875A"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </Svg>
-          <Text style={styles.schemeTagText}>WOMEN EMPOWERMENT MANIPUR</Text>
-        </View>
+
 
         {/* Title Header */}
         <View style={styles.titleRow}>
@@ -835,30 +788,44 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               Track the status of your application and stay updated.
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.submitAppButton}
-            onPress={handleSubmitNewApplication}
-            activeOpacity={0.8}>
-            <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M12 5V19M5 12H19"
-                stroke="#FFFFFF"
-                strokeWidth={2.6}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </Svg>
-            <Text style={styles.submitAppText}>Submit new application</Text>
-          </TouchableOpacity>
         </View>
 
         {/* ══════════════════════════════════════════════════════
             CARD: ACTIVE APPLICATION STATUS
            ══════════════════════════════════════════════════════ */}
-        <View style={styles.applicationCard}>
-          {/* Top Row: Icon + ID + Date + Tag + 3-dots */}
-          <View style={styles.cardTopRow}>
-            <View style={styles.cardHeaderLeft}>
+        <View style={[styles.applicationCard, isAadhaarUnverified && styles.aadhaarApprovalCard]}>
+          {isAadhaarUnverified ? (
+            <View style={styles.aadhaarApprovalCenteredWrap}>
+              <TouchableOpacity
+                style={styles.approveAadhaarCenteredButton}
+                onPress={handleApproveAadhaar}
+                activeOpacity={0.75}>
+                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                  <Path
+                    d="M12 22S4 18 4 12V5L12 2L20 5V12C20 18 12 22 12 22Z"
+                    stroke="#2563EB"
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <Path
+                    d="M9 12L11 14L15 10"
+                    stroke="#2563EB"
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
+                <Text style={styles.approveAadhaarCenteredText}>
+                  Approve your Aadhaar
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              {/* Top Row: Icon + ID + Date + Tag + 3-dots */}
+              <View style={styles.cardTopRow}>
+                <View style={styles.cardHeaderLeft}>
               <View
                 style={[
                   styles.docIconBox,
@@ -1252,31 +1219,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
               </View>
 
-              {/* Action Button: Approve Aadhaar or Continue */}
-              {isAadhaarUnverified ? (
-                <TouchableOpacity
-                  style={styles.approveAadhaarButton}
-                  onPress={handleApproveAadhaar}
-                  activeOpacity={0.75}>
-                  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M12 22S4 18 4 12V5L12 2L20 5V12C20 18 12 22 12 22Z"
-                      stroke="#2563EB"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <Path
-                      d="M9 12L11 14L15 10"
-                      stroke="#2563EB"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                  <Text style={styles.approveAadhaarText}>Approve Aadhaar</Text>
-                </TouchableOpacity>
-              ) : isInProgress ? (
+              {/* Action Button: Continue */}
+              {isInProgress ? (
                 <TouchableOpacity
                   style={styles.viewDetailsButton}
                   onPress={handleApplicationPress}
@@ -1295,117 +1239,14 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               ) : null}
             </>
           )}
-        </View>
+        </>
+      )}
+    </View>
 
         {/* ══════════════════════════════════════════════════════
             CARD: NEED ASSISTANCE?
            ══════════════════════════════════════════════════════ */}
-        <View style={styles.assistanceCard}>
-          {/* Header */}
-          <View style={styles.assistanceHeader}>
-            <View style={styles.assistanceIconBox}>
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M3 18V12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12V18"
-                  stroke="#00875A"
-                  strokeWidth={1.8}
-                  strokeLinecap="round"
-                />
-                <Rect
-                  x="2"
-                  y="14"
-                  width="4"
-                  height="7"
-                  rx="2"
-                  fill="#D1FAE5"
-                  stroke="#00875A"
-                  strokeWidth={1.5}
-                />
-                <Rect
-                  x="18"
-                  y="14"
-                  width="4"
-                  height="7"
-                  rx="2"
-                  fill="#D1FAE5"
-                  stroke="#00875A"
-                  strokeWidth={1.5}
-                />
-              </Svg>
-            </View>
 
-            <View style={styles.assistanceTitleWrap}>
-              <Text style={styles.assistanceTitle}>Need assistance?</Text>
-              <Text style={styles.assistanceSub}>
-                Our support team is available.
-              </Text>
-            </View>
-          </View>
-
-          {/* Contact Details List */}
-          <View style={styles.assistanceDetailsList}>
-            {/* Phone */}
-            <TouchableOpacity
-              style={styles.assistanceRow}
-              onPress={handleCallAssistance}
-              activeOpacity={0.7}>
-              <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M22 16.92V19.92C22 20.48 21.54 20.94 20.98 20.92C10.5 20.38 2.08 11.96 1.54 1.48C1.52 0.92 1.98 0.46 2.54 0.46H5.54C6.04 0.46 6.46 0.84 6.52 1.34C6.64 2.34 6.88 3.32 7.24 4.24C7.38 4.6 7.28 5.02 6.98 5.28L5.5 6.76C7.2 10.14 9.94 12.88 13.32 14.58L14.8 13.1C15.06 12.8 15.48 12.7 15.84 12.84C16.76 13.2 17.74 13.44 18.74 13.56C19.24 13.62 19.62 14.04 19.62 14.54V17.54"
-                  stroke="#00875A"
-                  strokeWidth={1.8}
-                />
-              </Svg>
-              <Text style={styles.assistanceText}>{assistancePhone}</Text>
-            </TouchableOpacity>
-
-            {/* Email */}
-            <TouchableOpacity
-              style={styles.assistanceRow}
-              onPress={handleEmailAssistance}
-              activeOpacity={0.7}>
-              <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
-                <Rect
-                  x="2"
-                  y="4"
-                  width="20"
-                  height="16"
-                  rx="3"
-                  stroke="#00875A"
-                  strokeWidth={1.8}
-                />
-                <Path d="M2 7L12 13L22 7" stroke="#00875A" strokeWidth={1.8} />
-              </Svg>
-              <Text style={styles.assistanceText}>{assistanceEmail}</Text>
-            </TouchableOpacity>
-
-            {/* Hours */}
-            <View style={styles.assistanceRow}>
-              <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
-                <Circle cx="12" cy="12" r="10" stroke="#00875A" strokeWidth={1.8} />
-                <Path d="M12 6V12L16 14" stroke="#00875A" strokeWidth={1.8} />
-              </Svg>
-              <Text style={styles.assistanceText}>{assistanceTiming}</Text>
-            </View>
-          </View>
-
-          {/* Get Help Link */}
-          <TouchableOpacity
-            style={styles.getHelpAction}
-            onPress={() => navigation.navigate('Help')}
-            activeOpacity={0.7}>
-            <Text style={styles.getHelpActionText}>Get Help</Text>
-            <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M5 12H19M19 12L12 5M19 12L12 19"
-                stroke="#00875A"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </Svg>
-          </TouchableOpacity>
-        </View>
 
         {/* Bottom spacer for tab bar */}
         <View style={styles.bottomSpacer} />
@@ -1829,6 +1670,40 @@ const styles = StyleSheet.create({
   },
   approveAadhaarText: {
     fontSize: 13.5,
+    fontWeight: '600',
+    color: '#2563EB',
+  },
+  aadhaarApprovalCard: {
+    paddingVertical: 36,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 120,
+  },
+  aadhaarApprovalCenteredWrap: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  approveAadhaarCenteredButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#2563EB',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    gap: 8,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  approveAadhaarCenteredText: {
+    fontSize: 15,
     fontWeight: '600',
     color: '#2563EB',
   },

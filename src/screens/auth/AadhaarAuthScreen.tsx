@@ -52,6 +52,7 @@ import {
   getStoredLoanDetails,
   setStoredLoanDetails,
   setUserProfile,
+  getUserProfile,
 } from '../../services/storage';
 import type {RootStackScreenProps} from '../../types/navigation';
 
@@ -68,7 +69,6 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
   const [redirectUrl, setRedirectUrl] = useState('');
   const [digilockerRequestId, setDigilockerRequestId] = useState('');
   const [showDigiLocker, setShowDigiLocker] = useState(false);
-  const [consentGiven, setConsentGiven] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   // Ineligible Applicant Modal State (e.g., "Applicant must be female")
@@ -141,12 +141,6 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
       toast.error(msg);
       return;
     }
-    if (!consentGiven) {
-      const msg = 'Please provide your consent to proceed';
-      setError(msg);
-      toast.error(msg);
-      return;
-    }
     setError('');
     setIsLoading(true);
 
@@ -215,7 +209,6 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
     }
   }, [
     aadhaarNumber,
-    consentGiven,
     route?.params?.applicationId,
     route?.params?.loanId,
     toast,
@@ -355,6 +348,7 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
         route?.params?.loanId ||
         '961701b5-47bb-4050-9d12-8e553159953e';
       let resolvedLoanId = activeLoanId;
+      let loanData: any = null;
 
       try {
         console.log(`[DigiLocker] Fetching unauth loan details for applicationNumber / loanId: ${activeLoanId}`);
@@ -375,7 +369,7 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
         }
 
         if (response && response.data) {
-          const loanData = response.data;
+          loanData = response.data;
           await setStoredLoanDetails(loanData);
           if (loanData.userDetails) {
             await setUserProfile(loanData.userDetails);
@@ -412,35 +406,78 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
       // Show single success toast
       toast.success('Aadhaar Verified Successfully');
 
-      const isFromHomeScreen =
-        route?.params?.fromScreen === 'Home' ||
-        Boolean(route?.params?.applicationId) ||
-        Boolean(route?.params?.loanId);
-
-      if (isFromHomeScreen) {
-        console.log(
-          '[DigiLocker] Verified after Home screen -> redirecting to Home screen',
-        );
-        navigation.navigate('MainTabs', { screen: 'Home' } as any);
-        return;
+      // Resolve user phone from storage if not already populated
+      let cleanUserPhone = (userPhone || '').trim();
+      if (!cleanUserPhone) {
+        try {
+          const storedProfile = await getUserProfile<any>();
+          const profilePhone =
+            storedProfile?.phone ||
+            storedProfile?.mobileNumber ||
+            storedProfile?.mobile;
+          if (profilePhone) {
+            cleanUserPhone = String(profilePhone).trim();
+          }
+        } catch {}
       }
 
-      const cleanUserPhone = (userPhone || '').trim();
+      const stepStr = (loanData?.step || '').toLowerCase().trim().replace(/[-_\s]/g, '');
 
-      // If phone number is present, skip Mobile Verification and go directly to PersonalInfo
-      if (cleanUserPhone.length > 0) {
+      // Navigate forward to the next step (do not return to dashboard)
+      if (stepStr === 'loanshg' || stepStr.includes('shg')) {
+        console.log('[DigiLocker] Navigating to next step: SHGDetails');
+        navigation.navigate('SHGDetails', {
+          loanId: resolvedLoanId,
+          applicationNumber: appNumber || candidateId,
+          fieldList: route?.params?.fieldList || loanData?.fieldList,
+          loanStatus: route?.params?.loanStatus || loanData?.loanStatus,
+        });
+      } else if (stepStr === 'address' || stepStr.startsWith('address')) {
+        console.log('[DigiLocker] Navigating to next step: AddressDetails');
+        navigation.navigate('AddressDetails', {
+          loanId: resolvedLoanId,
+          applicationNumber: appNumber || candidateId,
+          fieldList: route?.params?.fieldList || loanData?.fieldList,
+          loanStatus: route?.params?.loanStatus || loanData?.loanStatus,
+        });
+      } else if (stepStr === 'economyactivity' || stepStr.includes('activity')) {
+        console.log('[DigiLocker] Navigating to next step: EconomicActivity');
+        navigation.navigate('EconomicActivity', {
+          loanId: resolvedLoanId,
+          applicationNumber: appNumber || candidateId,
+          fieldList: route?.params?.fieldList || loanData?.fieldList,
+          loanStatus: route?.params?.loanStatus || loanData?.loanStatus,
+        });
+      } else if (stepStr === 'familyincome' || stepStr.includes('income')) {
+        console.log('[DigiLocker] Navigating to next step: IncomeDetails');
+        navigation.navigate('IncomeDetails', {
+          loanId: resolvedLoanId,
+          applicationNumber: appNumber || candidateId,
+          fieldList: route?.params?.fieldList || loanData?.fieldList,
+          loanStatus: route?.params?.loanStatus || loanData?.loanStatus,
+        });
+      } else if (stepStr === 'review' || stepStr.startsWith('review') || stepStr === 'loandetails') {
+        console.log('[DigiLocker] Navigating to next step: ReviewApplication');
+        navigation.navigate('ReviewApplication', {
+          loanId: resolvedLoanId,
+          applicationNumber: appNumber || candidateId,
+          fieldList: route?.params?.fieldList || loanData?.fieldList,
+          loanStatus: route?.params?.loanStatus || loanData?.loanStatus,
+        });
+      } else if (cleanUserPhone.length > 0) {
         console.log(
-          `[DigiLocker] Phone number present (${cleanUserPhone}), skipping Mobile Verification -> PersonalInfo`,
+          `[DigiLocker] Phone number present (${cleanUserPhone}), proceeding to next step: PersonalInfo`,
         );
         navigation.navigate('PersonalInfo', {
           loanId: resolvedLoanId,
           applicationNumber: appNumber || candidateId,
           verifiedPhone: cleanUserPhone,
+          fieldList: route?.params?.fieldList || loanData?.fieldList,
+          loanStatus: route?.params?.loanStatus || loanData?.loanStatus,
         });
       } else {
-        // If phone number is not present, show Mobile Verification screen
         console.log(
-          '[DigiLocker] No phone number present, navigating to Mobile Verification',
+          '[DigiLocker] No phone number present, navigating to MobileVerification',
         );
         navigation.navigate('MobileVerification', {
           loanId: resolvedLoanId,
@@ -466,7 +503,7 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
   }, []);
 
   const isComplete =
-    aadhaarNumber.replace(/\D/g, '').length === 12 && consentGiven;
+    aadhaarNumber.replace(/\D/g, '').length === 12;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -514,20 +551,6 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
             </Text>
           </View>
 
-          {/* "Why we need this?" Info Card */}
-          <View style={styles.infoCard}>
-            <View style={styles.infoIconWrapper}>
-              <Text style={styles.infoIconText}>i</Text>
-            </View>
-            <View style={styles.infoTextWrapper}>
-              <Text style={styles.infoTitle}>Why we need this?</Text>
-              <Text style={styles.infoDescription}>
-                Aadhaar authentication helps us verify your identity securely
-                and ensure you receive the right benefits.
-              </Text>
-            </View>
-          </View>
-
           {/* Aadhaar Input Section */}
           <View style={styles.inputSection}>
             <View style={styles.inputLabelRow}>
@@ -547,146 +570,6 @@ const AadhaarAuthScreen: React.FC<Props> = ({navigation, route}) => {
               error={error}
             />
           </View>
-
-          {/* "How it works" Section */}
-          <View style={styles.howItWorksSection}>
-            <View style={styles.howItWorksHeader}>
-              <View style={styles.howItWorksIconWrap}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M12 22S4 18 4 12V5L12 2L20 5V12C20 18 12 22 12 22Z"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M9 12L11 14L15 10"
-                    stroke="#00875A"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              </View>
-              <Text style={styles.howItWorksTitle}>How it works</Text>
-            </View>
-
-            <View style={styles.howItWorksCard}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.stepsScrollContainer}>
-                {/* Step 1 */}
-                <View style={styles.stepItem}>
-                  <View style={styles.stepBadge}>
-                    <Text style={styles.stepBadgeText}>1</Text>
-                  </View>
-                  <Text style={styles.stepText}>
-                    We will send OTP to your Aadhaar registered mobile number
-                  </Text>
-                </View>
-
-                {/* Arrow */}
-                <View style={styles.stepArrowWrap}>
-                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M5 12H19M19 12L13 6M19 12L13 18"
-                      stroke="#475569"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </View>
-
-                {/* Step 2 */}
-                <View style={styles.stepItem}>
-                  <View style={styles.stepBadge}>
-                    <Text style={styles.stepBadgeText}>2</Text>
-                  </View>
-                  <Text style={styles.stepText}>
-                    You enter OTP to verify your identity
-                  </Text>
-                </View>
-
-                {/* Arrow */}
-                <View style={styles.stepArrowWrap}>
-                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M5 12H19M19 12L13 6M19 12L13 18"
-                      stroke="#475569"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </View>
-
-                {/* Step 3 */}
-                <View style={styles.stepItem}>
-                  <View style={styles.stepBadge}>
-                    <Text style={styles.stepBadgeText}>3</Text>
-                  </View>
-                  <Text style={styles.stepText}>
-                    We verify with UIDAI and fetch your Aadhaar details
-                  </Text>
-                </View>
-
-                {/* Arrow */}
-                <View style={styles.stepArrowWrap}>
-                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M5 12H19M19 12L13 6M19 12L13 18"
-                      stroke="#475569"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </View>
-
-                {/* Step 4 */}
-                <View style={styles.stepItem}>
-                  <View style={styles.stepBadge}>
-                    <Text style={styles.stepBadgeText}>4</Text>
-                  </View>
-                  <Text style={styles.stepText}>
-                    We proceed with your WeManipur scheme
-                  </Text>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-
-          {/* Consent Checkbox Card */}
-          <TouchableOpacity
-            style={styles.consentCard}
-            onPress={() => setConsentGiven(prev => !prev)}
-            activeOpacity={0.8}>
-            <View
-              style={[
-                styles.checkbox,
-                consentGiven && styles.checkboxSelected,
-              ]}>
-              {consentGiven && (
-                <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M20 6L9 17L4 12"
-                    stroke="#FFFFFF"
-                    strokeWidth={3}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              )}
-            </View>
-            <Text style={styles.consentText}>
-              I have read and understood the above notice and I provide my
-              consent to use my Aadhaar details for verification and processing
-              of my We Manipur Scheme.
-            </Text>
-          </TouchableOpacity>
 
           {/* Primary Action Button: Verify Aadhaar */}
           <TouchableOpacity
@@ -755,7 +638,7 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: 28,
     paddingHorizontal: 12,
   },
   title: {
@@ -813,7 +696,7 @@ const styles = StyleSheet.create({
   },
   // Input Section
   inputSection: {
-    marginBottom: 18,
+    marginBottom: 28,
   },
   inputLabelRow: {
     flexDirection: 'row',

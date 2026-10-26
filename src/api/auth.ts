@@ -5,6 +5,7 @@ import {getToken} from '../services/storage';
 export interface ApplicantLoginPayload {
   phone?: string;
   applicationId?: string;
+  isDraft?: boolean;
 }
 
 export interface ApplicantLoginResponse {
@@ -21,14 +22,17 @@ export interface ApplicantLoginResponse {
 
 /**
  * Sends OTP to the applicant's mobile number or application ID
- * @param payload { phone?: string; applicationId?: string }
+ * @param payload { phone?: string; applicationId?: string; isDraft?: boolean }
  */
 export const applicantLogin = async (
   payload: ApplicantLoginPayload,
 ): Promise<ApplicantLoginResponse> => {
   const response = await apiClient.post<ApplicantLoginResponse>(
     API_ENDPOINTS.APPLICANT_LOGIN,
-    payload,
+    {
+      isDraft: true,
+      ...payload,
+    },
   );
   return response.data;
 };

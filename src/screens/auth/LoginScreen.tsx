@@ -6,7 +6,7 @@
  * 3. VERIFYING: Animated Circular Progress Ring
  * 4. SUCCESS: Animated Checkmark Badge + Dashboard Redirect
  */
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -18,11 +18,13 @@ import {
   StatusBar,
   Alert,
   ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Rect} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Rect } from 'react-native-svg';
 
-import {Logo, useToast} from '../../components';
+import { Logo, useToast } from '../../components';
 import {
   AuthHeader,
   LandscapeFooter,
@@ -34,12 +36,12 @@ import {
   SuccessBadge,
   WatermarkBackground,
 } from '../../components/auth';
-import {Colors} from '../../constants/colors';
-import {Typography} from '../../constants/typography';
-import {Layout} from '../../constants/layout';
-import {setToken, setUserProfile} from '../../services/storage';
-import {applicantLogin, resendOtp, verifyOtp} from '../../api';
-import {encryptAes256Cbc} from '../../utils/crypto';
+import { Colors } from '../../constants/colors';
+import { Typography } from '../../constants/typography';
+import { Layout } from '../../constants/layout';
+import { setToken, setUserProfile } from '../../services/storage';
+import { applicantLogin, resendOtp, verifyOtp } from '../../api';
+import { encryptAes256Cbc } from '../../utils/crypto';
 
 export type LoginStep = 'PHONE' | 'OTP' | 'VERIFYING' | 'SUCCESS';
 
@@ -50,6 +52,8 @@ interface LoginScreenProps {
   initialStep?: LoginStep;
 }
 
+type ScrollViewInstance = React.ElementRef<typeof ScrollView>;
+
 const RESEND_INTERVAL = 120; // 2 minutes (120 seconds)
 
 const LoginScreen: React.FC<LoginScreenProps> = ({
@@ -59,6 +63,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   initialStep = 'PHONE',
 }) => {
   const toast = useToast();
+  const scrollViewRef = useRef<ScrollViewInstance | null>(null);
   const [step, setStep] = useState<LoginStep>(initialStep);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -68,6 +73,31 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [sessionPhone, setSessionPhone] = useState<string | null>(null);
+
+  // Track keyboard state for smooth scrolling on Android
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, e => {
+      setIsKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setIsKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -133,7 +163,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await applicantLogin({phone: cleanPhone});
+      const response = await applicantLogin({ phone: cleanPhone, isDraft: true });
 
       if (response && response.success) {
         toast.success(response.message || 'Otp send successfully');
@@ -176,7 +206,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     setIsResending(true);
 
     try {
-      const response = await resendOtp({phone: cleanPhone});
+      const response = await resendOtp({ phone: cleanPhone });
 
       if (response && (response.status === true || response.success === true)) {
         toast.success(response.message || 'OTP resend successfully');
@@ -218,7 +248,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
         otp: Number(otp),
       });
 
-      const response = await verifyOtp({data: encryptedData});
+      const response = await verifyOtp({ data: encryptedData });
 
       if (response && (response.status === true || response.success === true)) {
         const token = response.data?.token;
@@ -274,9 +304,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
   const minutes = Math.floor(timer / 60);
   const seconds = timer % 60;
-  const formattedTimer = `${minutes < 10 ? `0${minutes}` : minutes}:${
-    seconds < 10 ? `0${seconds}` : seconds
-  }`;
+  const formattedTimer = `${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds
+    }`;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -289,20 +318,29 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
         style={styles.keyboardContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Navigation Header */}
-        <AuthHeader
+        {/* <AuthHeader
           showBack={step !== 'SUCCESS'}
           onBack={handleBack}
-        />
+        /> */}
 
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          ref={scrollViewRef}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isKeyboardVisible && styles.scrollContentWithKeyboard,
+            {
+              paddingBottom: isKeyboardVisible
+                ? (Platform.OS === 'android' ? 140 : 60)
+                : Layout.spacing.lg,
+            },
+          ]}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled">
-          {/* Centered Brand Logo */}
-          <View style={styles.logoSection}>
-            <Logo size="small" showSubtitle={true} />
-          </View>
-
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          bounces={true}
+          overScrollMode="always">
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.scrollInner}>
           {/* ══════════════════════════════════════════════════════
               STEP 1: LOGIN WITH MOBILE NUMBER
              ══════════════════════════════════════════════════════ */}
@@ -331,17 +369,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
               </View>
 
               {/* Security Shield Card */}
-              <SecurityNoticeCard
-                message="We will send an OTP to your registered mobile number linked with your account."
-                style={styles.noticeSpacing}
-              />
+
 
               {/* Primary Action Button: Send OTP */}
               <TouchableOpacity
                 style={[
                   styles.primaryButton,
                   (phoneNumber.length < 10 || isLoading) &&
-                    styles.primaryButtonDisabled,
+                  styles.primaryButtonDisabled,
                 ]}
                 onPress={handleSendOtp}
                 disabled={isLoading || phoneNumber.length < 10}
@@ -364,51 +399,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                 )}
               </TouchableOpacity>
 
-              {/* "OR" Divider */}
-              <View style={styles.orDividerContainer}>
-                <View style={styles.orLine} />
-                <Text style={styles.orText}>OR</Text>
-                <View style={styles.orLine} />
-              </View>
 
-              {/* Secondary Button: Login with Application Number */}
-              <TouchableOpacity
-                style={styles.outlineButton}
-                onPress={() => {
-                  if (onNavigateToApplicationLogin) {
-                    onNavigateToApplicationLogin();
-                  } else {
-                    Alert.alert(
-                      'Application Login',
-                      'Application Number login will be available soon.',
-                    );
-                  }
-                }}
-                activeOpacity={0.8}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Rect
-                    x="4"
-                    y="3"
-                    width="16"
-                    height="18"
-                    rx="2"
-                    stroke="#0284C7"
-                    strokeWidth={1.8}
-                  />
-                  <Path
-                    d="M8 8H16M8 12H16M8 16H13"
-                    stroke="#0284C7"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-                <Text style={styles.outlineButtonText}>
-                  Login with Application Number
-                </Text>
-              </TouchableOpacity>
 
               {/* Security Footer Note */}
-              <SecurityFooter style={styles.footerNote} />
             </View>
           )}
 
@@ -484,10 +477,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
               </TouchableOpacity>
 
               {/* Security Shield Card */}
-              <SecurityNoticeCard
+              {/* <SecurityNoticeCard
                 message="Your information is secure with us. We follow strict security and privacy standards."
                 style={styles.noticeSpacing}
-              />
+              /> */}
             </View>
           )}
 
@@ -515,10 +508,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
               <SuccessBadge size={120} />
 
               <Text style={styles.title}>Login Successful</Text>
-              <Text style={styles.welcomeText}>Welcome to WEManipur</Text>
-              <Text style={[styles.subtitle, styles.centeredSubtitle, styles.redirectSubtitle]}>
-                You will be redirected to your dashboard{'\n'}in a few seconds...
-              </Text>
+              {/* <Text style={styles.welcomeText}>Welcome to WEManipur</Text> */}
+
 
               {/* Go to Dashboard CTA */}
               <TouchableOpacity
@@ -539,12 +530,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
             </View>
           )}
 
-          {/* Spacer for bottom landscape illustration */}
-          <View style={styles.bottomSpacer} />
+            </View>
+          </TouchableWithoutFeedback>
         </ScrollView>
 
         {/* Decorative Landscape Footer Illustration */}
-        <LandscapeFooter height={130} />
+        {/* <LandscapeFooter height={130} /> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -560,13 +551,19 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: Layout.spacing.xl,
-    paddingBottom: 120, // space above landscape
+    paddingVertical: Layout.spacing.lg,
+  },
+  scrollContentWithKeyboard: {
+    justifyContent: 'flex-start',
+    paddingTop: Platform.OS === 'android' ? 36 : 20,
+  },
+  scrollInner: {
+    width: '100%',
   },
   logoSection: {
-    alignItems: 'center',
-    marginTop: Layout.spacing.xs,
-    marginBottom: Layout.spacing.lg,
+    display: 'none',
   },
   stepContainer: {
     width: '100%',
@@ -574,7 +571,6 @@ const styles = StyleSheet.create({
   centeredStepContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: Layout.spacing['2xl'],
   },
   headerSection: {
     alignItems: 'center',
