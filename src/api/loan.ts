@@ -494,6 +494,46 @@ export const submitDeclarationDetails = async (
 };
 
 
+export interface DistrictItem {
+  id: number;
+  name: string;
+  districtCode: string;
+}
+
+export interface DistrictResponse {
+  success: boolean;
+  message: string;
+  data: DistrictItem[];
+}
+
+/**
+ * Fetch district list by state code (GET /api/district?stateCode=MN)
+ */
+export const getDistricts = async (
+  stateCode: string = 'MN',
+): Promise<DistrictResponse> => {
+  try {
+    const response = await apiClient.get<DistrictResponse>(
+      API_ENDPOINTS.DISTRICT(stateCode),
+    );
+    return response.data;
+  } catch (err: any) {
+    if (__DEV__ && (err?.code === 'ERR_NETWORK' || err?.response?.status === 404)) {
+      try {
+        const localHostUrl =
+          Platform.OS === 'android'
+            ? `http://10.0.2.2:3000/api/district?stateCode=${stateCode}`
+            : `http://localhost:3000/api/district?stateCode=${stateCode}`;
+        const localResponse = await apiClient.get<DistrictResponse>(localHostUrl);
+        return localResponse.data;
+      } catch {
+        throw err;
+      }
+    }
+    throw err;
+  }
+};
+
 export interface LoanListItem {
   id: string;
   applicationNumber: string;

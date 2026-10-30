@@ -61,30 +61,7 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
   const [timer, setTimer] = useState(RESEND_INTERVAL);
   const [canResend, setCanResend] = useState(false);
 
-  // Track keyboard state for smooth scrolling on Android
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  useEffect(() => {
-    const showEvent =
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent =
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
-    const showSub = Keyboard.addListener(showEvent, e => {
-      setIsKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      setIsKeyboardVisible(false);
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -310,15 +287,7 @@ const ApplicationLoginScreen: React.FC<ApplicationLoginScreenProps> = ({
 
         <ScrollView
           ref={scrollViewRef}
-          contentContainerStyle={[
-            styles.scrollContent,
-            isKeyboardVisible && styles.scrollContentWithKeyboard,
-            {
-              paddingBottom: isKeyboardVisible
-                ? (Platform.OS === 'android' ? 140 : 60)
-                : Layout.spacing['2xl'],
-            },
-          ]}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
@@ -667,12 +636,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: Layout.spacing.xl,
-    paddingBottom: Layout.spacing['2xl'],
+    paddingVertical: Layout.spacing.xl,
     justifyContent: 'center',
-  },
-  scrollContentWithKeyboard: {
-    justifyContent: 'flex-start',
-    paddingTop: Platform.OS === 'android' ? 36 : 20,
   },
   scrollInner: {
     width: '100%',

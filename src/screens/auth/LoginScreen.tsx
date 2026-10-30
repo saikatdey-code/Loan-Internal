@@ -74,30 +74,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   const [isResending, setIsResending] = useState(false);
   const [sessionPhone, setSessionPhone] = useState<string | null>(null);
 
-  // Track keyboard state for smooth scrolling on Android
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-
-  useEffect(() => {
-    const showEvent =
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent =
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
-    const showSub = Keyboard.addListener(showEvent, e => {
-      setIsKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      setIsKeyboardVisible(false);
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -325,15 +301,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
         <ScrollView
           ref={scrollViewRef}
-          contentContainerStyle={[
-            styles.scrollContent,
-            isKeyboardVisible && styles.scrollContentWithKeyboard,
-            {
-              paddingBottom: isKeyboardVisible
-                ? (Platform.OS === 'android' ? 140 : 60)
-                : Layout.spacing.lg,
-            },
-          ]}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
@@ -553,11 +521,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: Layout.spacing.xl,
-    paddingVertical: Layout.spacing.lg,
-  },
-  scrollContentWithKeyboard: {
-    justifyContent: 'flex-start',
-    paddingTop: Platform.OS === 'android' ? 36 : 20,
+    paddingVertical: Layout.spacing.xl,
   },
   scrollInner: {
     width: '100%',

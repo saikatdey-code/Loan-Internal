@@ -22,4 +22,5 @@ export const API_ENDPOINTS = {
   NOTIFICATION_LIST: '/api/notification/list',
   FRONTEND_DELETE_USER: '/api/user/frontend-delete',
   ASSISTANCE_DATA: '/api/assistance-data',
+  DISTRICT: (stateCode: string) => `/api/district?stateCode=${stateCode}`,
 } as const;

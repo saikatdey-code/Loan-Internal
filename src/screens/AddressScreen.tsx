@@ -41,7 +41,7 @@ import {
   getStoredLoanDetails,
   setStoredLoanDetails,
 } from '../services/storage';
-import { submitAddressDetails, SubmitAddressPayload, getLoanDetailsAuth, getLoanList } from '../api/loan';
+import { submitAddressDetails, SubmitAddressPayload, getLoanDetailsAuth, getLoanList, getDistricts } from '../api/loan';
 import { checkInternetConnection, showNoInternetAlert } from '../utils';
 
 type Props = RootStackScreenProps<'AddressDetails'>;
@@ -50,24 +50,25 @@ type ScrollViewInstance = React.ElementRef<typeof ScrollView>;
 type TextInputInstance = React.ElementRef<typeof TextInput>;
 type ViewInstance = React.ElementRef<typeof View>;
 
-// 16 Official Districts of Manipur with Numeric IDs
-const MANIPUR_DISTRICTS: OptionItem[] = [
-  { id: '1', label: 'Imphal West' },
-  { id: '2', label: 'Imphal East' },
-  { id: '3', label: 'Thoubal' },
-  { id: '4', label: 'Bishnupur' },
-  { id: '5', label: 'Kakching' },
-  { id: '6', label: 'Churachandpur' },
-  { id: '7', label: 'Ukhrul' },
-  { id: '8', label: 'Senapati' },
-  { id: '9', label: 'Tamenglong' },
-  { id: '10', label: 'Chandel' },
-  { id: '11', label: 'Kangpokpi' },
-  { id: '12', label: 'Tengnoupal' },
-  { id: '13', label: 'Kamjong' },
-  { id: '14', label: 'Noney' },
-  { id: '15', label: 'Pherzawl' },
-  { id: '16', label: 'Jiribam' },
+// Districts will be fetched from API: GET /api/district?stateCode=MN
+// Fallback static list used when API call fails
+const FALLBACK_DISTRICTS: OptionItem[] = [
+  { id: '1', label: 'Bishnupur' },
+  { id: '2', label: 'Chandel' },
+  { id: '3', label: 'Churachandpur' },
+  { id: '4', label: 'Imphal East' },
+  { id: '5', label: 'Imphal West' },
+  { id: '6', label: 'Jiribam' },
+  { id: '7', label: 'Kakching' },
+  { id: '8', label: 'Kamjong' },
+  { id: '9', label: 'Kangpokpi' },
+  { id: '10', label: 'Noney' },
+  { id: '11', label: 'Pherzawl' },
+  { id: '12', label: 'Senapati' },
+  { id: '13', label: 'Tamenglong' },
+  { id: '14', label: 'Tengnoupal' },
+  { id: '15', label: 'Thoubal' },
+  { id: '16', label: 'Ukhrul' },
 ];
 
 const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
@@ -96,6 +97,9 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  // Districts fetched from API
+  const [districts, setDistricts] = useState<OptionItem[]>(FALLBACK_DISTRICTS);
+  const [isDistrictsLoading, setIsDistrictsLoading] = useState<boolean>(false);
   // Modals
   const [districtModalVisible, setDistrictModalVisible] =
     useState<boolean>(false);
@@ -128,6 +132,37 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
     return () => {
       showSub.remove();
       hideSub.remove();
+    };
+  }, []);
+
+  // ─── Fetch Districts from API ────────────────────────────────
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDistricts = async () => {
+      setIsDistrictsLoading(true);
+      try {
+        const response = await getDistricts('MN');
+        if (response?.success && response.data?.length > 0 && isMounted) {
+          const mappedDistricts: OptionItem[] = response.data.map(item => ({
+            id: String(item.id),
+            label: item.name,
+            value: item.districtCode,
+          }));
+          setDistricts(mappedDistricts);
+        }
+      } catch (err) {
+        console.warn('[AddressScreen] Failed to fetch districts, using fallback:', err);
+        // Keep FALLBACK_DISTRICTS as default
+      } finally {
+        if (isMounted) {
+          setIsDistrictsLoading(false);
+        }
+      }
+    };
+
+    fetchDistricts();
+    return () => {
+      isMounted = false;
     };
   }, []);
 
@@ -186,7 +221,7 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
                   ? addr.district
                   : '');
 
-              const found = MANIPUR_DISTRICTS.find(
+              const found = FALLBACK_DISTRICTS.find(
                 d =>
                   (districtName &&
                     d.label.toLowerCase() === districtName.toLowerCase()) ||
@@ -764,8 +799,9 @@ const AddressScreen: React.FC<Props> = ({ navigation, route }) => {
       <SelectionModal
         visible={districtModalVisible}
         title="Choose Your District"
-        options={MANIPUR_DISTRICTS}
+        options={districts}
         selectedValue={districtId}
+        isLoading={isDistrictsLoading}
         onSelect={opt => {
           setDistrictId(opt.id);
           setDistrictLabel(opt.label);

@@ -823,51 +823,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             </View>
           ) : (
             <>
-              {/* Top Row: Icon + ID + Date + Tag + 3-dots */}
+              {/* Top Row: Status pill + 3-dots */}
               <View style={styles.cardTopRow}>
                 <View style={styles.cardHeaderLeft}>
-              <View
-                style={[
-                  styles.docIconBox,
-                  isRejected && styles.docIconBoxRejected,
-                ]}>
-                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                    stroke={isRejected ? '#DC2626' : '#00875A'}
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M14 2V8H20"
-                    stroke={isRejected ? '#DC2626' : '#00875A'}
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M16 13H8M16 17H8M10 9H8"
-                    stroke={isRejected ? '#DC2626' : '#00875A'}
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-              </View>
-
-              <View style={styles.appIdInfo}>
-                <Text style={styles.appNoLabel}>Application No.</Text>
-                <Text
-                  style={[
-                    styles.appNumberText,
-                    isRejected && styles.appNumberTextRejected,
-                  ]}>
-                  {displayAppNumber}
-                </Text>
-                <Text style={styles.appliedDateText}>
-                  Applied on: {appliedDate}
-                </Text>
-
                 <View
                   style={[
                     styles.submittedPill,
@@ -895,7 +853,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   </Text>
                 </View>
               </View>
-            </View>
 
             {/* Three Dots Menu (⋮) */}
             <TouchableOpacity

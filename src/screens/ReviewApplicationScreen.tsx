@@ -471,9 +471,6 @@ const ReviewApplicationScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const displayAppId =
     loanData?.applicationNumber || loanData?.applicationId || fallbackAppNumber;
-  const displayAppliedDate = formatDate(
-    loanData?.appliedAt || loanData?.createdAt,
-  );
   const normalizedStep = (loanData?.step || '')
     .toLowerCase()
     .trim()
@@ -484,21 +481,6 @@ const ReviewApplicationScreen: React.FC<Props> = ({ navigation, route }) => {
     .replace(/[-_\s]/g, '');
 
   const isRejected = normalizedStatus === 'rejected';
-
-  const isSubmittedApplication =
-    normalizedStatus === 'submitted' ||
-    normalizedStatus === 'approved' ||
-    isRejected ||
-    (normalizedStep === 'review' &&
-      normalizedStatus !== 'inprogress' &&
-      normalizedStatus !== 'in_progress' &&
-      normalizedStatus !== 'draft');
-
-  const displayStatus = loanData?.loanStatus
-    ? loanData.loanStatus.toUpperCase()
-    : isSubmittedApplication
-      ? 'SUBMITTED'
-      : 'IN PROGRESS';
 
   // Count uploaded documents
   const docPhotos = [
@@ -601,79 +583,6 @@ const ReviewApplicationScreen: React.FC<Props> = ({ navigation, route }) => {
             </View>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              CARD 1: APPLICATION DETAILS
-             ══════════════════════════════════════════════════════ */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <View style={styles.cardHeaderLeft}>
-                <View style={[styles.iconBox, styles.iconBoxGreen]}>
-                  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                      stroke="#00875A"
-                      strokeWidth={1.8}
-                    />
-                    <Path
-                      d="M14 2V8H20M16 13H8M16 17H8M10 9H8"
-                      stroke="#00875A"
-                      strokeWidth={1.8}
-                    />
-                  </Svg>
-                </View>
-                <Text style={styles.cardTitle}>Application Details</Text>
-              </View>
-
-              {/* Submitted / Rejected Badge */}
-              <View
-                style={[
-                  styles.submittedBadge,
-                  isRejected && styles.rejectedBadge,
-                ]}>
-                <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-                  {isRejected ? (
-                    <Path
-                      d="M18 6L6 18M6 6L18 18"
-                      stroke="#DC2626"
-                      strokeWidth={2.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  ) : (
-                    <Path
-                      d="M20 6L9 17L4 12"
-                      stroke="#00875A"
-                      strokeWidth={2.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  )}
-                </Svg>
-                <Text
-                  style={[
-                    styles.submittedBadgeText,
-                    isRejected && styles.rejectedBadgeText,
-                  ]}>
-                  {displayStatus}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.detailsGrid}>
-              <View style={styles.gridRow}>
-                <Text style={styles.gridLabel}>Application ID</Text>
-                <Text style={styles.gridValue}>{displayAppId}</Text>
-              </View>
-              <View style={styles.gridRow}>
-                <Text style={styles.gridLabel}>Applied On</Text>
-                <Text style={styles.gridValue}>{displayAppliedDate}</Text>
-              </View>
-            </View>
-
-            <Text style={styles.cardNoticeText}>
-              Please verify all details carefully before submitting.
-            </Text>
-          </View>
 
           {/* Rejection Notice Banner if rejected */}
           {isRejected && (
