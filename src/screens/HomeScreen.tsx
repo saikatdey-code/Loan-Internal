@@ -826,128 +826,128 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               {/* Top Row: Status pill + 3-dots */}
               <View style={styles.cardTopRow}>
                 <View style={styles.cardHeaderLeft}>
-                <View
-                  style={[
-                    styles.submittedPill,
-                    isRejected && styles.rejectedPill,
-                    isApproved && styles.approvedPill,
-                    isInProgress && styles.inProgressPill,
-                  ]}>
+                  <View
+                    style={[
+                      styles.submittedPill,
+                      isRejected && styles.rejectedPill,
+                      isApproved && styles.approvedPill,
+                      isInProgress && styles.inProgressPill,
+                    ]}>
+                    <Text
+                      style={[
+                        styles.submittedPillText,
+                        isRejected && styles.rejectedPillText,
+                        isApproved && styles.approvedPillText,
+                        isInProgress && styles.inProgressPillText,
+                      ]}>
+                      {isRejected
+                        ? 'Rejected'
+                        : isApproved
+                          ? 'Approved'
+                          : isInProgress
+                            ? 'In Progress'
+                            : activeLoan?.loanStatus
+                              ? activeLoan.loanStatus.charAt(0).toUpperCase() +
+                              activeLoan.loanStatus.slice(1)
+                              : 'Submitted'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Three Dots Menu (⋮) */}
+                <TouchableOpacity
+                  onPress={handleOptionsPress}
+                  style={styles.optionsButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+                    <Circle cx="12" cy="5" r="2" fill="#94A3B8" />
+                    <Circle cx="12" cy="12" r="2" fill="#94A3B8" />
+                    <Circle cx="12" cy="19" r="2" fill="#94A3B8" />
+                  </Svg>
+                </TouchableOpacity>
+              </View>
+
+              {/* Divider */}
+              <View style={styles.cardDivider} />
+
+              {/* 3-Column Metrics Section */}
+              <View style={styles.metricsContainer}>
+                {/* Col 1: Current Stage */}
+                <View style={styles.metricColumn}>
+                  <View style={styles.metricIconWrap}>
+                    {/* 3 layered discs icon */}
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M12 2L2 7L12 12L22 7L12 2Z"
+                        stroke="#00875A"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <Path
+                        d="M2 17L12 22L22 17"
+                        stroke="#00875A"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <Path
+                        d="M2 12L12 17L22 12"
+                        stroke="#00875A"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </Svg>
+                  </View>
+                  <Text style={styles.metricLabel}>Current Stage</Text>
                   <Text
                     style={[
-                      styles.submittedPillText,
-                      isRejected && styles.rejectedPillText,
-                      isApproved && styles.approvedPillText,
-                      isInProgress && styles.inProgressPillText,
+                      styles.metricStageValue,
+                      isRejected && styles.metricStageValueRejected,
+                      isApproved && styles.metricStageValueApproved,
                     ]}>
                     {isRejected
-                      ? 'Rejected'
+                      ? 'Application Rejected'
                       : isApproved
-                        ? 'Approved'
+                        ? 'Application Approved'
                         : isInProgress
-                          ? 'In Progress'
-                          : activeLoan?.loanStatus
-                            ? activeLoan.loanStatus.charAt(0).toUpperCase() +
-                            activeLoan.loanStatus.slice(1)
-                            : 'Submitted'}
+                          ? getStepDisplayLabel(activeLoan?.step, activeLoan)
+                          : 'Application Submitted'}
                   </Text>
+                  <View
+                    style={[
+                      styles.miniSubmittedTag,
+                      isRejected && styles.miniRejectedTag,
+                      isApproved && styles.miniApprovedTag,
+                      isInProgress && styles.miniInProgressTag,
+                    ]}>
+                    <Text
+                      style={[
+                        styles.miniSubmittedText,
+                        isRejected && styles.miniRejectedText,
+                        isApproved && styles.miniApprovedText,
+                        isInProgress && styles.miniInProgressText,
+                      ]}>
+                      {isRejected
+                        ? 'Rejected'
+                        : isApproved
+                          ? 'Approved'
+                          : isInProgress
+                            ? 'In Progress'
+                            : activeLoan?.loanStatus
+                              ? activeLoan.loanStatus.charAt(0).toUpperCase() +
+                              activeLoan.loanStatus.slice(1)
+                              : 'Submitted'}
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-            {/* Three Dots Menu (⋮) */}
-            <TouchableOpacity
-              onPress={handleOptionsPress}
-              style={styles.optionsButton}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                <Circle cx="12" cy="5" r="2" fill="#94A3B8" />
-                <Circle cx="12" cy="12" r="2" fill="#94A3B8" />
-                <Circle cx="12" cy="19" r="2" fill="#94A3B8" />
-              </Svg>
-            </TouchableOpacity>
-          </View>
+                {/* Vertical separator */}
+                <View style={styles.verticalSep} />
 
-          {/* Divider */}
-          <View style={styles.cardDivider} />
-
-          {/* 3-Column Metrics Section */}
-          <View style={styles.metricsContainer}>
-            {/* Col 1: Current Stage */}
-            <View style={styles.metricColumn}>
-              <View style={styles.metricIconWrap}>
-                {/* 3 layered discs icon */}
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M12 2L2 7L12 12L22 7L12 2Z"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M2 17L12 22L22 17"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M2 12L12 17L22 12"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              </View>
-              <Text style={styles.metricLabel}>Current Stage</Text>
-              <Text
-                style={[
-                  styles.metricStageValue,
-                  isRejected && styles.metricStageValueRejected,
-                  isApproved && styles.metricStageValueApproved,
-                ]}>
-                {isRejected
-                  ? 'Application Rejected'
-                  : isApproved
-                    ? 'Application Approved'
-                    : isInProgress
-                      ? getStepDisplayLabel(activeLoan?.step, activeLoan)
-                      : 'Application Submitted'}
-              </Text>
-              <View
-                style={[
-                  styles.miniSubmittedTag,
-                  isRejected && styles.miniRejectedTag,
-                  isApproved && styles.miniApprovedTag,
-                  isInProgress && styles.miniInProgressTag,
-                ]}>
-                <Text
-                  style={[
-                    styles.miniSubmittedText,
-                    isRejected && styles.miniRejectedText,
-                    isApproved && styles.miniApprovedText,
-                    isInProgress && styles.miniInProgressText,
-                  ]}>
-                  {isRejected
-                    ? 'Rejected'
-                    : isApproved
-                      ? 'Approved'
-                      : isInProgress
-                        ? 'In Progress'
-                        : activeLoan?.loanStatus
-                          ? activeLoan.loanStatus.charAt(0).toUpperCase() +
-                          activeLoan.loanStatus.slice(1)
-                          : 'Submitted'}
-                </Text>
-              </View>
-            </View>
-
-            {/* Vertical separator */}
-            <View style={styles.verticalSep} />
-
-            {/* Col 2: Days Elapsed */}
-            {/* <View style={styles.metricColumn}>
+                {/* Col 2: Days Elapsed */}
+                {/* <View style={styles.metricColumn}>
               <View style={styles.metricIconWrap}>
                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                   <Circle
@@ -969,236 +969,236 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={styles.metricNumberValue}>{elapsedText}</Text>
             </View> */}
 
-            {/* Vertical separator */}
-            <View style={styles.verticalSep} />
+                {/* Vertical separator */}
+                <View style={styles.verticalSep} />
 
-            {/* Col 3: Last Updated */}
-            <View style={styles.metricColumn}>
-              <View style={styles.metricIconWrap}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                  <Rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="18"
-                    rx="2"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                  />
-                  <Path
-                    d="M16 2V6M8 2V6M3 10H21"
-                    stroke="#00875A"
-                    strokeWidth={1.8}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-              </View>
-              <Text style={styles.metricLabel}>Last Updated</Text>
-              <Text style={styles.metricNumberValue}>{lastUpdatedDate}</Text>
-            </View>
-          </View>
-
-          {isRejected ? (
-            <View style={styles.rejectionSection}>
-              {/* Action Required Header */}
-              <View style={styles.actionRequiredHeader}>
-                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                  <Circle cx="12" cy="12" r="10" stroke="#DC2626" strokeWidth={2} />
-                  <Path
-                    d="M12 7V13M12 17H12.01"
-                    stroke="#DC2626"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                  />
-                </Svg>
-                <Text style={styles.actionRequiredTitle}>Action required</Text>
-              </View>
-
-              <Text style={styles.actionRequiredDescription}>
-                Your application has been rejected. Review the details and make the required changes.
-              </Text>
-
-              {/* Officer Feedback Box */}
-              <View style={styles.officerFeedbackCard}>
-                <View style={styles.officerFeedbackTopRow}>
-                  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
-                      stroke="#DC2626"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                  <Text style={styles.officerFeedbackLabel}>Officer Feedback</Text>
+                {/* Col 3: Last Updated */}
+                <View style={styles.metricColumn}>
+                  <View style={styles.metricIconWrap}>
+                    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                      <Rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        stroke="#00875A"
+                        strokeWidth={1.8}
+                      />
+                      <Path
+                        d="M16 2V6M8 2V6M3 10H21"
+                        stroke="#00875A"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </View>
+                  <Text style={styles.metricLabel}>Last Updated</Text>
+                  <Text style={styles.metricNumberValue}>{lastUpdatedDate}</Text>
                 </View>
+              </View>
 
-                {/* Reason Title */}
-                {Boolean(rejectionReason) && (
-                  <Text style={styles.feedbackReasonTitle}>{rejectionReason}</Text>
-                )}
+              {isRejected ? (
+                <View style={styles.rejectionSection}>
+                  {/* Action Required Header */}
+                  <View style={styles.actionRequiredHeader}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                      <Circle cx="12" cy="12" r="10" stroke="#DC2626" strokeWidth={2} />
+                      <Path
+                        d="M12 7V13M12 17H12.01"
+                        stroke="#DC2626"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                    <Text style={styles.actionRequiredTitle}>Action required</Text>
+                  </View>
 
-                {/* Officer Comment Body */}
-                {Boolean(officerComment) && (
-                  <Text style={styles.feedbackCommentBody}>{officerComment}</Text>
-                )}
+                  <Text style={styles.actionRequiredDescription}>
+                    Your application has been rejected. Review the details and make the required changes.
+                  </Text>
 
-                {/* Optional corrections list if specified */}
-                {correctionFieldsArray.length > 0 ? (
-                  <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: '#64748B', marginBottom: 6 }}>
-                      Fields requiring attention
-                    </Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                      {correctionFieldsArray.map((field, idx) => (
-                        <View
-                          key={idx}
-                          style={{
-                            backgroundColor: '#FEE2E2',
-                            paddingHorizontal: 10,
-                            paddingVertical: 3,
-                            borderRadius: 16,
-                          }}>
-                          <Text style={{ fontSize: 12, fontWeight: '600', color: '#991B1B' }}>
-                            {field}
-                          </Text>
+                  {/* Officer Feedback Box */}
+                  <View style={styles.officerFeedbackCard}>
+                    <View style={styles.officerFeedbackTopRow}>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                        <Path
+                          d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+                          stroke="#DC2626"
+                          strokeWidth={1.8}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                      <Text style={styles.officerFeedbackLabel}>Officer Feedback</Text>
+                    </View>
+
+                    {/* Reason Title */}
+                    {Boolean(rejectionReason) && (
+                      <Text style={styles.feedbackReasonTitle}>{rejectionReason}</Text>
+                    )}
+
+                    {/* Officer Comment Body */}
+                    {Boolean(officerComment) && (
+                      <Text style={styles.feedbackCommentBody}>{officerComment}</Text>
+                    )}
+
+                    {/* Optional corrections list if specified */}
+                    {correctionFieldsArray.length > 0 ? (
+                      <View style={{ marginTop: 10 }}>
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: '#64748B', marginBottom: 6 }}>
+                          Fields requiring attention
+                        </Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                          {correctionFieldsArray.map((field, idx) => (
+                            <View
+                              key={idx}
+                              style={{
+                                backgroundColor: '#FEE2E2',
+                                paddingHorizontal: 10,
+                                paddingVertical: 3,
+                                borderRadius: 16,
+                              }}>
+                              <Text style={{ fontSize: 12, fontWeight: '600', color: '#991B1B' }}>
+                                {field}
+                              </Text>
+                            </View>
+                          ))}
                         </View>
-                      ))}
+                      </View>
+                    ) : Boolean(correctionFieldsFormatted) ? (
+                      <Text style={styles.feedbackCorrectionsLine}>
+                        Corrections requested for: {correctionFieldsFormatted}
+                      </Text>
+                    ) : null}
+
+                    {/* Updated by footer */}
+                    <Text style={styles.feedbackMetaText}>
+                      Updated by {updatedByText} · {lastUpdatedDate}
+                    </Text>
+                  </View>
+
+                  {/* Action Buttons Row */}
+                  <View style={styles.rejectionActionsRow}>
+                    {/* Button 1: View Details */}
+                    <TouchableOpacity
+                      style={styles.viewDetailsOutlineBtn}
+                      onPress={handleViewDetails}
+                      activeOpacity={0.75}>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                        <Path
+                          d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z"
+                          stroke="#2563EB"
+                          strokeWidth={1.8}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <Circle cx="12" cy="12" r="3" stroke="#2563EB" strokeWidth={1.8} />
+                      </Svg>
+                      <Text style={styles.viewDetailsOutlineBtnText}>View Details</Text>
+                    </TouchableOpacity>
+
+                    {/* Button 2: Edit & Resubmit */}
+                    <TouchableOpacity
+                      style={styles.editResubmitBtn}
+                      onPress={handleEditAndResubmit}
+                      activeOpacity={0.75}>
+                      <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+                        <Path
+                          d="M11 4H4C3.44772 4 3 4.44772 3 5V20C3 20.5523 3.44772 21 4 21H19C19.5523 21 20 20.5523 20 20V13M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89783 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"
+                          stroke="#FFFFFF"
+                          strokeWidth={1.8}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                      <Text style={styles.editResubmitBtnText}>Edit & Resubmit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <>
+                  {/* Notice Container for Approved / In Progress / Under Review */}
+                  <View
+                    style={[
+                      styles.reviewNoticeBox,
+                      isApproved && styles.approvedNoticeBox,
+                    ]}>
+                    <View style={styles.infoCircleWrap}>
+                      <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                        {isApproved ? (
+                          <>
+                            <Circle cx="12" cy="12" r="10" stroke="#15803D" strokeWidth={1.8} />
+                            <Path
+                              d="M8 12L11 15L16 9"
+                              stroke="#15803D"
+                              strokeWidth={2}
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <Circle cx="12" cy="12" r="10" stroke="#00875A" strokeWidth={1.8} />
+                            <Path
+                              d="M12 16V12M12 8H12.01"
+                              stroke="#00875A"
+                              strokeWidth={2}
+                              strokeLinecap="round"
+                            />
+                          </>
+                        )}
+                      </Svg>
+                    </View>
+                    <View style={styles.reviewNoticeTextWrap}>
+                      <Text
+                        style={[
+                          styles.reviewNoticeHeading,
+                          isApproved && styles.approvedNoticeHeading,
+                        ]}>
+                        {isAadhaarUnverified
+                          ? 'Please verify your identity to process your application.'
+                          : isApproved
+                            ? 'Application Approved'
+                            : isInProgress
+                              ? 'Application is in progress'
+                              : 'Application is under review'}
+                      </Text>
+                      <Text style={styles.reviewNoticeDescription}>
+                        {isAadhaarUnverified
+                          ? 'You will be notified once there is an update.'
+                          : isApproved
+                            ? 'Congratulations! Your loan application has been approved. You will be contacted soon regarding disbursement.'
+                            : isInProgress
+                              ? 'Your application is currently incomplete.\nTap Continue to proceed with your application.'
+                              : 'Your application is fully completed, submitted, and currently\nunder review. You will be notified once there is an update.'}
+                      </Text>
                     </View>
                   </View>
-                ) : Boolean(correctionFieldsFormatted) ? (
-                  <Text style={styles.feedbackCorrectionsLine}>
-                    Corrections requested for: {correctionFieldsFormatted}
-                  </Text>
-                ) : null}
 
-                {/* Updated by footer */}
-                <Text style={styles.feedbackMetaText}>
-                  Updated by {updatedByText} · {lastUpdatedDate}
-                </Text>
-              </View>
-
-              {/* Action Buttons Row */}
-              <View style={styles.rejectionActionsRow}>
-                {/* Button 1: View Details */}
-                <TouchableOpacity
-                  style={styles.viewDetailsOutlineBtn}
-                  onPress={handleViewDetails}
-                  activeOpacity={0.75}>
-                  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z"
-                      stroke="#2563EB"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <Circle cx="12" cy="12" r="3" stroke="#2563EB" strokeWidth={1.8} />
-                  </Svg>
-                  <Text style={styles.viewDetailsOutlineBtnText}>View Details</Text>
-                </TouchableOpacity>
-
-                {/* Button 2: Edit & Resubmit */}
-                <TouchableOpacity
-                  style={styles.editResubmitBtn}
-                  onPress={handleEditAndResubmit}
-                  activeOpacity={0.75}>
-                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M11 4H4C3.44772 4 3 4.44772 3 5V20C3 20.5523 3.44772 21 4 21H19C19.5523 21 20 20.5523 20 20V13M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89783 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"
-                      stroke="#FFFFFF"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                  <Text style={styles.editResubmitBtnText}>Edit & Resubmit</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <>
-              {/* Notice Container for Approved / In Progress / Under Review */}
-              <View
-                style={[
-                  styles.reviewNoticeBox,
-                  isApproved && styles.approvedNoticeBox,
-                ]}>
-                <View style={styles.infoCircleWrap}>
-                  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                    {isApproved ? (
-                      <>
-                        <Circle cx="12" cy="12" r="10" stroke="#15803D" strokeWidth={1.8} />
+                  {/* Action Button: Continue */}
+                  {isInProgress ? (
+                    <TouchableOpacity
+                      style={styles.viewDetailsButton}
+                      onPress={handleApplicationPress}
+                      activeOpacity={0.75}>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                         <Path
-                          d="M8 12L11 15L16 9"
-                          stroke="#15803D"
+                          d="M5 12H19M19 12L12 5M19 12L12 19"
+                          stroke="#2563EB"
                           strokeWidth={2}
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-                      </>
-                    ) : (
-                      <>
-                        <Circle cx="12" cy="12" r="10" stroke="#00875A" strokeWidth={1.8} />
-                        <Path
-                          d="M12 16V12M12 8H12.01"
-                          stroke="#00875A"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                        />
-                      </>
-                    )}
-                  </Svg>
-                </View>
-                <View style={styles.reviewNoticeTextWrap}>
-                  <Text
-                    style={[
-                      styles.reviewNoticeHeading,
-                      isApproved && styles.approvedNoticeHeading,
-                    ]}>
-                    {isAadhaarUnverified
-                      ? 'Please verify your identity to process your application.'
-                      : isApproved
-                        ? 'Application Approved'
-                        : isInProgress
-                          ? 'Application is in progress'
-                          : 'Application is under review'}
-                  </Text>
-                  <Text style={styles.reviewNoticeDescription}>
-                    {isAadhaarUnverified
-                      ? 'You will be notified once there is an update.'
-                      : isApproved
-                        ? 'Congratulations! Your loan application has been approved. You will be contacted soon regarding disbursement.'
-                        : isInProgress
-                          ? 'Your application is currently incomplete.\nTap Continue to proceed with your application.'
-                          : 'Your application is fully completed, submitted, and currently\nunder review. You will be notified once there is an update.'}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Action Button: Continue */}
-              {isInProgress ? (
-                <TouchableOpacity
-                  style={styles.viewDetailsButton}
-                  onPress={handleApplicationPress}
-                  activeOpacity={0.75}>
-                  <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M5 12H19M19 12L12 5M19 12L12 19"
-                      stroke="#2563EB"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                  <Text style={styles.viewDetailsText}>Continue</Text>
-                </TouchableOpacity>
-              ) : null}
+                      </Svg>
+                      <Text style={styles.viewDetailsText}>Continue</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </>
+              )}
             </>
           )}
-        </>
-      )}
-    </View>
+        </View>
 
         {/* ══════════════════════════════════════════════════════
             CARD: NEED ASSISTANCE?
