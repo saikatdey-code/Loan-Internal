@@ -374,6 +374,43 @@ export const getOccupations = async (): Promise<OccupationResponse> => {
   }
 };
 
+export interface FamilyIncomeItem {
+  id: number;
+  name: string;
+}
+
+export interface FamilyIncomeResponse {
+  success: boolean;
+  message: string;
+  data: FamilyIncomeItem[];
+}
+
+/**
+ * Fetch family income list (GET /api/family-income)
+ */
+export const getFamilyIncomes = async (): Promise<FamilyIncomeResponse> => {
+  try {
+    const response = await apiClient.get<FamilyIncomeResponse>(
+      API_ENDPOINTS.FAMILY_INCOME,
+    );
+    return response.data;
+  } catch (err: any) {
+    if (__DEV__ && (err?.code === 'ERR_NETWORK' || err?.response?.status === 404)) {
+      try {
+        const localHostUrl =
+          Platform.OS === 'android'
+            ? 'http://10.0.2.2:3000/api/family-income'
+            : 'http://localhost:3000/api/family-income';
+        const localResponse = await apiClient.get<FamilyIncomeResponse>(localHostUrl);
+        return localResponse.data;
+      } catch {
+        throw err;
+      }
+    }
+    throw err;
+  }
+};
+
 export interface SubmitEconomicActivityPayload {
   loanId: string;
   economicActivity: string;

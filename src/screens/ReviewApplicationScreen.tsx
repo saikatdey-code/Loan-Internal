@@ -170,30 +170,24 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
       try {
         setIsLoading(true);
 
-        const isInvalidId = (id?: string | null) =>
-          !id ||
-          id === 'b6c25f77-857d-499c-a712-c64bcd9317a7' ||
-          id === 'b69488e4-3d79-4688-b80f-2e01a8a562ba' ||
-          id === '1b268acc-508c-4fca-94ca-a3cd4d23fc47';
-
         let resolvedLoanId = route.params?.loanId;
 
-        if (isInvalidId(resolvedLoanId)) {
+        if (!resolvedLoanId) {
           const storedId = await getLoanId();
-          if (!isInvalidId(storedId)) {
-            resolvedLoanId = storedId!;
+          if (storedId) {
+            resolvedLoanId = storedId;
           }
         }
 
-        if (isInvalidId(resolvedLoanId)) {
+        if (!resolvedLoanId) {
           const storedDetails = await getStoredLoanDetails<any>();
-          if (!isInvalidId(storedDetails?.id)) {
+          if (storedDetails?.id) {
             resolvedLoanId = storedDetails.id;
           }
         }
 
         // If still not found, fetch user's active loan applications list
-        if (isInvalidId(resolvedLoanId)) {
+        if (!resolvedLoanId) {
           try {
             const listRes = await getLoanList();
             if (listRes && listRes.success && listRes.data?.rows?.length > 0) {
@@ -205,7 +199,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
           }
         }
 
-        if (resolvedLoanId && !isInvalidId(resolvedLoanId)) {
+        if (resolvedLoanId) {
           setActiveLoanId(resolvedLoanId);
           await setLoanId(resolvedLoanId);
 
@@ -377,6 +371,15 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
         (await getLoanId()) ||
         loanData?.id ||
         '';
+
+      if (!finalLoanId) {
+        toast.error('Application ID not found. Please try again.');
+        Alert.alert(
+          'Error',
+          'Application ID is missing. Please restart the application process.',
+        );
+        return;
+      }
 
       const applicantName = (
         declearedName ||
@@ -788,7 +791,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Gender</Text>
                   <Text style={styles.gridValue}>
-                    {user?.gender || 'MALE'}
+                    {user?.gender || '--'}
                   </Text>
                 </View>
               </View>
@@ -798,7 +801,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Category</Text>
                   <Text style={styles.gridValue}>
-                    {user?.category || 'General'}
+                    {user?.category || '--'}
                   </Text>
                 </View>
                 <View style={styles.itemBlock}>
@@ -806,13 +809,13 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                   <Text style={styles.gridValue}>
                     {user?.phone
                       ? `${user?.cc || '+91'} ${user.phone}`
-                      : '7557003298'}
+                      : '--'}
                   </Text>
                 </View>
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Date of Birth</Text>
                   <Text style={styles.gridValue}>
-                    {formatDate(user?.dob || '2000-09-22T00:00:00.000Z')}
+                    {user?.dob ? formatDate(user.dob) : '--'}
                   </Text>
                 </View>
               </View>
@@ -887,14 +890,18 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Village / Locality</Text>
                   <Text style={styles.gridValue}>
-                    {address?.locality || 'Mani Village'}
+                    {address?.locality || '--'}
                   </Text>
                 </View>
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>District</Text>
                   <Text style={styles.gridValue}>
                     {address?.districtName?.name ||
-                      (address?.district ? `District ${address.district}` : 'Bishnupur')}
+                      (address?.district
+                        ? isNaN(Number(address.district))
+                          ? address.district
+                          : `District ${address.district}`
+                        : '--')}
                   </Text>
                 </View>
               </View>
@@ -905,13 +912,13 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                     Gram Panchayat / Municipality / Block
                   </Text>
                   <Text style={styles.gridValue}>
-                    {address?.panchayat || address?.block || 'DA'}
+                    {address?.panchayat || address?.block || '--'}
                   </Text>
                 </View>
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>State</Text>
                   <Text style={styles.gridValue}>
-                    {address?.stateName?.name || 'Manipur'}
+                    {address?.stateName?.name || address?.state || 'Manipur'}
                   </Text>
                 </View>
               </View>
@@ -987,13 +994,13 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>SHG Name</Text>
                   <Text style={styles.gridValue}>
-                    {shg?.shgName || 'TestSAIK'}
+                    {shg?.shgName || '--'}
                   </Text>
                 </View>
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Date of Formation</Text>
                   <Text style={styles.gridValue}>
-                    {formatDate(shg?.dateOfFormation)}
+                    {shg?.dateOfFormation ? formatDate(shg.dateOfFormation) : '--'}
                   </Text>
                 </View>
               </View>
@@ -1002,7 +1009,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>SHG ID Number</Text>
                   <Text style={styles.gridValue}>
-                    {shg?.shgId || '2dew2dew'}
+                    {shg?.shgId || '--'}
                   </Text>
                 </View>
               </View>
@@ -1077,7 +1084,10 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
             <View style={styles.itemBlock}>
               <Text style={styles.gridLabel}>Annual Family Income</Text>
               <Text style={styles.gridValue}>
-                {cleanHtml(incomeRange?.name) || 'Rs. 2 lakh to Rs. 3 lakh'}
+                {cleanHtml(incomeRange?.name) ||
+                  cleanHtml(loanData?.familyIncomeRange?.name) ||
+                  cleanHtml(loanData?.familyIncome) ||
+                  '--'}
               </Text>
             </View>
           </View>
@@ -1144,7 +1154,10 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Economic Activity</Text>
                   <Text style={styles.gridValue}>
-                    {occupation?.name || 'Bakery Products'}
+                    {occupation?.name ||
+                      loanData?.occupationDetails?.name ||
+                      loanData?.economicActivity ||
+                      '--'}
                   </Text>
                 </View>
               </View>
@@ -1153,7 +1166,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
                 <View style={styles.itemBlock}>
                   <Text style={styles.gridLabel}>Description</Text>
                   <Text style={styles.gridValue}>
-                    {loanData?.descriptionOfProposedActivity || 'None'}
+                    {loanData?.descriptionOfProposedActivity || '--'}
                   </Text>
                 </View>
               </View>
@@ -1231,7 +1244,7 @@ const ReviewApplicationScreen: React.FC<Props> = ({navigation, route}) => {
               <View style={styles.columnHalf}>
                 <Text style={styles.gridLabel}>Current Application Step</Text>
                 <Text style={styles.gridValue}>
-                  {loanData?.step || 'review'}
+                  {loanData?.step ? String(loanData.step).toUpperCase() : '--'}
                 </Text>
               </View>
             </View>

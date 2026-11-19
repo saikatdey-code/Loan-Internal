@@ -23,4 +23,5 @@ export const API_ENDPOINTS = {
   FRONTEND_DELETE_USER: '/api/user/frontend-delete',
   ASSISTANCE_DATA: '/api/assistance-data',
   DISTRICT: (stateCode: string) => `/api/district?stateCode=${stateCode}`,
+  FAMILY_INCOME: '/api/family-income',
 } as const;

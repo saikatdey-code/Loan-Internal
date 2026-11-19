@@ -39,7 +39,7 @@ import type {RootStackScreenProps} from '../types/navigation';
 import {isFieldEditable} from '../utils/fieldPermissions';
 import {
   getLoanId,
-  setLoanId,
+  setLoanId as setStoredLoanId,
   getStoredLoanDetails,
   setStoredLoanDetails,
 } from '../services/storage';
@@ -172,43 +172,28 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
         const storedLoanId = await getLoanId();
         const storedDetails = await getStoredLoanDetails<any>();
 
-        const isInvalidId = (id?: string | null) =>
-          !id ||
-          id === 'b6c25f77-857d-499c-a712-c64bcd9317a7' ||
-          id === 'b69488e4-3d79-4688-b80f-2e01a8a562ba' ||
-          id === '1b268acc-508c-4fca-94ca-a3cd4d23fc47';
+        let activeId = route.params?.loanId || storedLoanId || storedDetails?.id || '';
 
-        let activeId = route.params?.loanId;
-        if (isInvalidId(activeId)) {
-          if (!isInvalidId(storedLoanId)) {
-            activeId = storedLoanId!;
-          }
-        }
-        if (isInvalidId(activeId)) {
-          if (!isInvalidId(storedDetails?.id)) {
-            activeId = storedDetails.id;
-          }
-        }
-        if (isInvalidId(activeId)) {
+        if (!activeId) {
           try {
             const listRes = await getLoanList();
             if (listRes?.success && listRes.data?.rows?.length > 0) {
               activeId = listRes.data.rows[0].id;
-              await setLoanId(activeId);
+              await setStoredLoanId(activeId);
             }
           } catch (listErr) {
             console.warn('[EconomicActivity] Failed to fetch loan list:', listErr);
           }
         }
 
-        if (activeId && !isInvalidId(activeId)) {
+        if (isMounted && activeId) {
           setLoanId(activeId);
         }
 
         let targetDetails = route.params?.loanDetails || storedDetails;
 
         // Fetch fresh details if activeId is valid
-        if (activeId && !isInvalidId(activeId)) {
+        if (activeId) {
           try {
             const detailsRes = await getLoanDetailsAuth(activeId);
             if (detailsRes?.success && detailsRes?.data) {
@@ -300,28 +285,24 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
     setIsSubmitting(true);
 
     try {
-      const isInvalidId = (id?: string | null) =>
-        !id ||
-        id === 'b6c25f77-857d-499c-a712-c64bcd9317a7' ||
-        id === 'b69488e4-3d79-4688-b80f-2e01a8a562ba' ||
-        id === '1b268acc-508c-4fca-94ca-a3cd4d23fc47';
+      const activeLoanId =
+        loanId ||
+        route.params?.loanId ||
+        (await getLoanId()) ||
+        (await getStoredLoanDetails<any>())?.id ||
+        '';
 
-      let activeLoanId = loanId || route.params?.loanId;
-      if (isInvalidId(activeLoanId)) {
-        const storedId = await getLoanId();
-        if (!isInvalidId(storedId)) {
-          activeLoanId = storedId!;
-        }
-      }
-      if (isInvalidId(activeLoanId)) {
-        const stored = await getStoredLoanDetails<any>();
-        if (!isInvalidId(stored?.id)) {
-          activeLoanId = stored.id;
-        }
+      if (!activeLoanId) {
+        toast.error('Application ID not found. Please try again.');
+        Alert.alert(
+          'Error',
+          'Application ID is missing. Please restart the application process.',
+        );
+        return;
       }
 
       const payload: SubmitEconomicActivityPayload = {
-        loanId: activeLoanId || '',
+        loanId: activeLoanId,
         economicActivity: selectedActivityId,
         otherEconomicGroup: null,
         descriptionOfProposedActivity: description.trim(),
@@ -334,9 +315,9 @@ const EconomicActivityScreen: React.FC<Props> = ({navigation, route}) => {
           response.message || 'Economic activity details saved successfully',
         );
 
-        const nextLoanId = response.data?.id || activeLoanId || '';
+        const nextLoanId = response.data?.id || activeLoanId;
         if (nextLoanId) {
-          await setLoanId(nextLoanId);
+          await setStoredLoanId(nextLoanId);
         }
 
         try {

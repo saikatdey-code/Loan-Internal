@@ -14,7 +14,7 @@
  * - API call: POST /api/loan/details with payload:
  *     { familyIncome, otherFamilyIncome, loanId }
  */
-import React, {useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -27,15 +27,16 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Svg, {Path, Circle, Ellipse} from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Ellipse } from 'react-native-svg';
 
-import {Logo, useToast, WatermarkBackground} from '../components';
+import { Logo, useToast, WatermarkBackground } from '../components';
 import SelectionModal from '../components/SelectionModal';
-import type {RootStackScreenProps} from '../types/navigation';
-import {isFieldEditable} from '../utils/fieldPermissions';
+import type { RootStackScreenProps } from '../types/navigation';
+import { isFieldEditable } from '../utils/fieldPermissions';
 import {
   getLoanId,
+  setLoanId as setStoredLoanId,
   getStoredLoanDetails,
   setStoredLoanDetails,
 } from '../services/storage';
@@ -44,8 +45,10 @@ import {
   SubmitIncomePayload,
   getLoanDetailsAuth,
   getLoanList,
+  getFamilyIncomes,
+  FamilyIncomeItem,
 } from '../api/loan';
-import {checkInternetConnection, showNoInternetAlert} from '../utils';
+import { checkInternetConnection, showNoInternetAlert } from '../utils';
 
 type Props = RootStackScreenProps<'IncomeDetails'>;
 
@@ -55,7 +58,7 @@ interface IncomeOption {
   amount: string;
 }
 
-const INCOME_OPTIONS: IncomeOption[] = [
+const FALLBACK_INCOME_OPTIONS: IncomeOption[] = [
   {
     id: '1',
     prefix: 'Less Than',
@@ -78,7 +81,52 @@ const INCOME_OPTIONS: IncomeOption[] = [
   },
 ];
 
-const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
+const capitalizeWords = (str: string): string => {
+  return str.replace(/\b[a-z]/g, char => char.toUpperCase());
+};
+
+const formatIncomeOption = (item: FamilyIncomeItem): IncomeOption => {
+  const name = (item.name || '').trim();
+  const lower = name.toLowerCase();
+
+  if (lower.startsWith('less than')) {
+    const amt = name.substring(9).trim();
+    return {
+      id: String(item.id),
+      prefix: 'Less Than',
+      amount: capitalizeWords(amt),
+    };
+  }
+
+  if (lower.startsWith('more than')) {
+    const amt = name.substring(9).trim();
+    return {
+      id: String(item.id),
+      prefix: 'More Than',
+      amount: capitalizeWords(amt),
+    };
+  }
+
+  const rangeMatch = name.match(/^(?:rs\.?\s*)?(\d+)\s*(?:-|to)\s*(\d+)\s*(lakh.*)?$/i);
+  if (rangeMatch) {
+    const start = rangeMatch[1];
+    const end = rangeMatch[2];
+    const unit = rangeMatch[3] ? rangeMatch[3].trim() : 'Lakh';
+    const unitCap = capitalizeWords(unit);
+    return {
+      id: String(item.id),
+      prefix: `Rs. ${start} ${unitCap} To`,
+      amount: `Rs. ${end} ${unitCap}`,
+    };
+  }
+
+  return {
+    id: String(item.id),
+    amount: capitalizeWords(name),
+  };
+};
+
+const IncomeDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
   const toast = useToast();
 
   const [loanStatus, setLoanStatus] = useState<string>(
@@ -89,6 +137,8 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
   );
   // No auto-selected option by default
   const [selectedIncomeId, setSelectedIncomeId] = useState<string>('');
+  const [incomeOptions, setIncomeOptions] = useState<IncomeOption[]>(FALLBACK_INCOME_OPTIONS);
+  const [isLoadingOptions, setIsLoadingOptions] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [loanId, setLoanId] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -100,6 +150,32 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
     loanStatus,
   );
 
+  // ─── Fetch Family Income List from API ───────────────────────
+  useEffect(() => {
+    let isMounted = true;
+    const fetchFamilyIncomes = async () => {
+      setIsLoadingOptions(true);
+      try {
+        const res = await getFamilyIncomes();
+        if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
+          const parsed = res.data.map(formatIncomeOption);
+          setIncomeOptions(parsed);
+        }
+      } catch (err) {
+        console.warn('[IncomeDetailsScreen] Failed to fetch family income options:', err);
+      } finally {
+        if (isMounted) {
+          setIsLoadingOptions(false);
+        }
+      }
+    };
+
+    fetchFamilyIncomes();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // ─── Initialize Data on Mount ────────────────────────────────
   useEffect(() => {
     let isMounted = true;
@@ -108,12 +184,6 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
         const paramLoanId = route.params?.loanId;
         const storedLoanId = await getLoanId();
         const storedDetails = await getStoredLoanDetails<any>();
-
-        const isInvalidId = (id?: string | null) =>
-          !id ||
-          id === 'b6c25f77-857d-499c-a712-c64bcd9317a7' ||
-          id === 'b69488e4-3d79-4688-b80f-2e01a8a562ba' ||
-          id === '1b268acc-508c-4fca-94ca-a3cd4d23fc47';
 
         const applyIncomeData = (details: any) => {
           if (!details) return;
@@ -143,38 +213,27 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           applyIncomeData(storedDetails);
         }
 
-        // Resolve activeId
-        let activeId = paramLoanId;
-        if (isInvalidId(activeId)) {
-          if (!isInvalidId(storedLoanId)) {
-            activeId = storedLoanId!;
-          }
-        }
-        if (isInvalidId(activeId)) {
-          if (!isInvalidId(storedDetails?.id)) {
-            activeId = storedDetails.id;
-          }
-        }
-        if (isInvalidId(activeId)) {
+        // Resolve activeId dynamically
+        let activeId = paramLoanId || storedLoanId || storedDetails?.id || '';
+
+        if (!activeId) {
           try {
             const listRes = await getLoanList();
             if (listRes?.success && listRes.data?.rows?.length > 0) {
               activeId = listRes.data.rows[0].id;
-              await setLoanId(activeId);
+              await setStoredLoanId(activeId);
             }
           } catch (listErr) {
             console.warn('[IncomeDetails] Failed to fetch loan list:', listErr);
           }
         }
 
-        if (isInvalidId(activeId)) {
-          activeId = '1b268acc-508c-4fca-94ca-a3cd4d23fc47';
+        if (isMounted) {
+          setLoanId(activeId);
         }
 
-        setLoanId(activeId || '1b268acc-508c-4fca-94ca-a3cd4d23fc47');
-
         // 2. Fetch fresh details from API if we have a valid loan ID
-        if (activeId && !isInvalidId(activeId)) {
+        if (activeId) {
           try {
             const res = await getLoanDetailsAuth(activeId);
             if (res && res.success && res.data && isMounted) {
@@ -227,7 +286,16 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
         loanId ||
         route.params?.loanId ||
         (await getLoanId()) ||
-        '1b268acc-508c-4fca-94ca-a3cd4d23fc47';
+        '';
+
+      if (!activeLoanId) {
+        toast.error('Application ID not found. Please try again.');
+        Alert.alert(
+          'Error',
+          'Application ID is missing. Please restart the application process.',
+        );
+        return;
+      }
 
       const payload: SubmitIncomePayload = {
         familyIncome: selectedIncomeId,
@@ -297,7 +365,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
 
   // ─── Handle Skip ─────────────────────────────────────────────
   const handleSkip = () => {
-    navigation.navigate('MainTabs', {screen: 'Home'} as any);
+    navigation.navigate('MainTabs', { screen: 'Home' } as any);
   };
 
   return (
@@ -316,7 +384,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           style={styles.backButton}
           onPress={handleBack}
           activeOpacity={0.7}
-          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
             <Path
               d="M19 12H5M5 12L12 19M5 12L12 5"
@@ -339,7 +407,7 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
           style={styles.skipButton}
           onPress={handleSkip}
           activeOpacity={0.7}
-          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.skipText}>Skip</Text>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
             <Path
@@ -404,78 +472,85 @@ const IncomeDetailsScreen: React.FC<Props> = ({navigation, route}) => {
               INCOME CARDS GRID (2x2)
              ══════════════════════════════════════════════════════ */}
           <View style={styles.cardsGrid}>
-            {INCOME_OPTIONS.map(option => {
-              const isSelected = selectedIncomeId === option.id;
+            {isLoadingOptions && incomeOptions.length === 0 ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#00875A" />
+                <Text style={styles.loadingText}>Loading income options...</Text>
+              </View>
+            ) : (
+              incomeOptions.map(option => {
+                const isSelected = selectedIncomeId === option.id;
 
-              return (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[
-                    styles.incomeCard,
-                    isSelected && styles.incomeCardSelected,
-                    Boolean(error) && !selectedIncomeId && styles.incomeCardError,
-                    !isFamilyIncomeEditable && !isSelected && styles.incomeCardDisabled,
-                    !isFamilyIncomeEditable && isSelected && styles.incomeCardDisabledSelected,
-                  ]}
-                  disabled={!isFamilyIncomeEditable || isSubmitting}
-                  onPress={() => {
-                    if (isFamilyIncomeEditable) {
-                      setSelectedIncomeId(option.id);
-                      if (error) {
-                        setError('');
-                      }
-                    }
-                  }}
-                  activeOpacity={0.8}>
-                  {/* Radio Circle (Top Left) */}
-                  <View
+                return (
+                  <TouchableOpacity
+                    key={option.id}
                     style={[
-                      styles.radioCircle,
-                      isSelected && styles.radioCircleSelected,
-                    ]}>
-                    {isSelected && <View style={styles.radioInnerDot} />}
-                  </View>
-
-                  {/* Center Icon Badge (Stack of Coins) */}
-                  <View style={styles.cardIconBadge}>
-                    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-                      <Ellipse
-                        cx="12"
-                        cy="6"
-                        rx="7"
-                        ry="2.5"
-                        stroke="#00875A"
-                        strokeWidth={1.7}
-                      />
-                      <Path
-                        d="M5 6V11C5 12.38 8.13 13.5 12 13.5C15.87 13.5 19 12.38 19 11V6"
-                        stroke="#00875A"
-                        strokeWidth={1.7}
-                      />
-                      <Path
-                        d="M5 11V16C5 17.38 8.13 18.5 12 18.5C15.87 18.5 19 17.38 19 16V11"
-                        stroke="#00875A"
-                        strokeWidth={1.7}
-                      />
-                    </Svg>
-                  </View>
-
-                  {/* Amount / Title Text */}
-                  <View style={styles.cardTextContainer}>
-                    {option.prefix ? (
-                      <Text style={styles.cardPrefixText}>{option.prefix}</Text>
-                    ) : null}
-                    <Text
+                      styles.incomeCard,
+                      isSelected && styles.incomeCardSelected,
+                      Boolean(error) && !selectedIncomeId && styles.incomeCardError,
+                      !isFamilyIncomeEditable && !isSelected && styles.incomeCardDisabled,
+                      !isFamilyIncomeEditable && isSelected && styles.incomeCardDisabledSelected,
+                    ]}
+                    disabled={!isFamilyIncomeEditable || isSubmitting}
+                    onPress={() => {
+                      if (isFamilyIncomeEditable) {
+                        setSelectedIncomeId(option.id);
+                        if (error) {
+                          setError('');
+                        }
+                      }
+                    }}
+                    activeOpacity={0.8}>
+                    {/* Radio Circle (Top Left) */}
+                    <View
                       style={[
-                        styles.cardAmountText,
-                        isSelected && styles.cardAmountTextSelected,
+                        styles.radioCircle,
+                        isSelected && styles.radioCircleSelected,
                       ]}>
-                      {option.amount}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+                      {isSelected && <View style={styles.radioInnerDot} />}
+                    </View>
+
+                    {/* Center Icon Badge (Stack of Coins) */}
+                    <View style={styles.cardIconBadge}>
+                      <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                        <Ellipse
+                          cx="12"
+                          cy="6"
+                          rx="7"
+                          ry="2.5"
+                          stroke="#00875A"
+                          strokeWidth={1.7}
+                        />
+                        <Path
+                          d="M5 6V11C5 12.38 8.13 13.5 12 13.5C15.87 13.5 19 12.38 19 11V6"
+                          stroke="#00875A"
+                          strokeWidth={1.7}
+                        />
+                        <Path
+                          d="M5 11V16C5 17.38 8.13 18.5 12 18.5C15.87 18.5 19 17.38 19 16V11"
+                          stroke="#00875A"
+                          strokeWidth={1.7}
+                        />
+                      </Svg>
+                    </View>
+
+                    {/* Amount / Title Text */}
+                    <View style={styles.cardTextContainer}>
+                      {option.prefix ? (
+                        <Text style={styles.cardPrefixText}>{option.prefix}</Text>
+                      ) : null}
+                      <Text
+                        style={[
+                          styles.cardAmountText,
+                          isSelected && styles.cardAmountTextSelected,
+                        ]}>
+                        {option.amount}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
+            )}
           </View>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -670,6 +745,18 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 16,
   },
+  loadingContainer: {
+    width: '100%',
+    paddingVertical: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
+  },
   incomeCard: {
     width: '48%',
     backgroundColor: '#FFFFFF',
@@ -686,7 +773,7 @@ const styles = StyleSheet.create({
     borderColor: '#00875A',
     backgroundColor: '#F0FDF4',
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -826,7 +913,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     shadowColor: '#00875A',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 4,

@@ -11,6 +11,7 @@ import {
   Pressable,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 
@@ -18,6 +19,7 @@ export interface OptionItem {
   id: string;
   label: string;
   sublabel?: string;
+  value?: string;
 }
 
 interface SelectionModalProps {
@@ -25,6 +27,7 @@ interface SelectionModalProps {
   title: string;
   options: OptionItem[];
   selectedValue?: string;
+  isLoading?: boolean;
   onSelect: (option: OptionItem) => void;
   onClose: () => void;
 }
@@ -34,6 +37,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
   title,
   options,
   selectedValue,
+  isLoading = false,
   onSelect,
   onClose,
 }) => {
@@ -48,6 +52,12 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
           <View style={styles.handle} />
           <Text style={styles.title}>{title}</Text>
 
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#00875A" />
+              <Text style={styles.loadingText}>Loading...</Text>
+            </View>
+          ) : (
           <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
             {options.map(item => {
               const isSelected = item.label === selectedValue || item.id === selectedValue;
@@ -98,6 +108,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
               );
             })}
           </ScrollView>
+          )}
 
           <TouchableOpacity
             style={styles.cancelBtn}
@@ -207,6 +218,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#475569',
+  },
+  loadingContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#64748B',
   },
 });
 
